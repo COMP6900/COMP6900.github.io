@@ -2,6 +2,7 @@ collections:
   authors:
     output: true
 
+# comment this out when push for now
 # theme: "just-the-docs"
 remote_theme: pmarsceill/just-the-docs
 search_enabled: true
@@ -35,4 +36,6 @@ aux_links:
   "Github":
     - "//github.com/comp6900"
 
-footer_content: "COMP6900 TM"
+footer_content: "COMP6900<sup>TM</sup>"
+
+color_scheme: great
