@@ -92,16 +92,24 @@ The answer is RV64IMAFDZicsrZifenceiC
 The people at sifive seemed to realise the potential of hardware efficiency gains. So they came up with 6 different ways to encode a 32-bit riscv instruction.
 
 ### R Format
+For arithmetic operations like `add`. Stuff that can be done in the ALU/FPU.
 
 ### I Format
+For arithmetic operations with an immediate like `addi`. Also loading to an ALU register from memory
 
 ### S Format
+Store operations from register to memory, stuff like `sw`.
+- In RISC world, must load (I) a val from memory to a register, then apply arithmetic ops (R/I), then store the val back (S)
 
 ### SB Format
+Branch to another address, updates the PC directly by specifying an offset instead of incrementing. Stuff like `beq`
 
 ### U Format
+Arithmetic ops with upper immediates like `lui`
+- In riscv, upper immediates are always 20bits, unlike *that* other arch
 
 ### UJ Format
+Jump to another address. Different to branch since you directly specify an address/offset rather than a relative offset. Also `link`. So `jal`
 
 
-Do you have to remember these? No. But you will have to implement it and `autotest` has to work so yea.
+Do you have to remember these? No. But you will have to implement it and `autotest-6900` has to work so yea.
