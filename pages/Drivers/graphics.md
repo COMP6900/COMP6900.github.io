@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Graphics Driver
+parent: Drivers
 ---
 Graphics drivers are prob the most complex stuff in coding existence. AMDGPU has like 12m lines of code itself. So yea.
 
