@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Lecture 1
+title: Lec1 Vid
 parent: Videos
 ---
 ## Lec 1 [NOT UPLOADED YET]

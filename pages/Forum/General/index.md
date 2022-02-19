@@ -3,6 +3,12 @@ layout: default
 title: General
 parent: Forum
 ---
-## Staticman or some custom layout for a forum topic/list of threads
-// CLICK ME TO ADD A THREAD
-// BECOMES A STATIC COMMENT/THREAD/POST in a blog style akin to webcms3
+## Thread
+
+<script src="https://utteranc.es/client.js"
+        repo="https://github.com/COMP6900/COMP6900.github.io"
+        issue-term="pathname"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
