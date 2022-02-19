@@ -92,24 +92,49 @@ The answer is RV64IMAFDZicsrZifenceiC
 The people at sifive seemed to realise the potential of hardware efficiency gains. So they came up with 6 different ways to encode a 32-bit riscv instruction.
 
 ### R Format
-For arithmetic operations like `add`. Stuff that can be done in the ALU/FPU.
+For arithmetic operations like `add`. Stuff that can be done in the ALU/FPU. <br/>
+
+`<instruction> <dest_reg> <src_reg1> <src_reg2>` 
+
+32-bit Instruction: <br/>
+[ func 7 | src_reg2 5 | src_reg1 5 | func 3 | dest_reg 5 | opcode 7 ]
 
 ### I Format
 For arithmetic operations with an immediate like `addi`. Also loading to an ALU register from memory
+
+32-bit Instruction: <br/>
+[ immediate_val 12 | src_reg 5 | func 3 | dest_reg 5 | opcode 7 ]
 
 ### S Format
 Store operations from register to memory, stuff like `sw`.
 - In RISC world, must load (I) a val from memory to a register, then apply arithmetic ops (R/I), then store the val back (S)
 
+32-bit Instruction: <br/>
+[ immediate_val[11..5] 7 | src_reg2 5 | src_reg1 5 | func 3 | immediate_val[4..0] 5 | opcode 7 ]
+
 ### SB Format
 Branch to another address, updates the PC directly by specifying an offset instead of incrementing. Stuff like `beq`
+
+TYPE 1: \
+[ immediate_val[12..5] 7 | src_reg2 5 | src_reg1 5 | func 3 | immediate_val[4..1] 5 | opcode 7 ]
+
+TYPE 2: \
+[ immediate_val[10..5] 7 | src_reg2 5 | src_reg1 5 | func 3 | immediate_val[4..11] 5 | opcode 7 ]
 
 ### U Format
 Arithmetic ops with upper immediates like `lui`
 - In riscv, upper immediates are always 20bits, unlike *that* other arch
 
+32-bit Instruction: \
+[ immediate_val[31:12] 20 | dest_reg 5 | opcode 7 ]
+
 ### UJ Format
 Jump to another address. Different to branch since you directly specify an address/offset rather than a relative offset. Also `link`. So `jal`
 
+32-bit Instruction: \
+[ immediate_val[31:12] 20 | dest_reg 5 | opcode 7 ]
+
+- so `jal` stores the return address in `dest_reg` unlike branch
+- Theres like at least 2 different types of instruction types for jal and jalr cause why not I guess
 
 Do you have to remember these? No. But you will have to implement it and `autotest-6900` has to work so yea.
