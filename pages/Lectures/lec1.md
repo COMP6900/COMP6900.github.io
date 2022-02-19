@@ -51,7 +51,7 @@ Does this count towards something?
 - To pass you have to show you understand what you're doing. Mostly assessment based with a 35% final exam.
 
 Are there video lectures?
-- Of course. Uploaded to https://www.youtube.com/channel/UC6qO4W9BRAPpUOUD43aDDvA. Or alternatively in the Videos section which embeds the videos with a custom HTML5 player.
+- Of course. Uploaded to [youtube](https://www.youtube.com/channel/UC6qO4W9BRAPpUOUD43aDDvA). Or alternatively in the Videos section which embeds the videos with a custom HTML5 player.
 
 ## What is COMP6900?
 Like a human body, a kernel can be thought of as an organism with different organs working together harmoniously to survive its environment. Its environment in this case is a messy ecosystem of code, apps, hardware and dumb users.
