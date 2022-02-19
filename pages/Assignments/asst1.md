@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Memory
+title: 22S1 - Asst1
 parent: Assignments
 ---
-## Assignment 1: RISC-V Instructions <strong>[Draft]</strong>
+## Assignment 1: CPU, Bootloaders and Memory <strong>[Draft]</strong>
 Starts Jan. 25th.
 
 | Feature | To be Assessed | % |
