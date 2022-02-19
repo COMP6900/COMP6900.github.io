@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 22S1 - Asst1
+title: Asst1 - 22S1
 parent: Assignments
 ---
 ## Assignment 1: CPU, Bootloaders and Memory <strong>[Draft]</strong>
