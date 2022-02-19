@@ -4,7 +4,7 @@ title: Asst1 - 22S1
 parent: Assignments
 ---
 ## Assignment 1: CPU, Bootloaders and Memory <strong>[Draft]</strong>
-Starts Jan. 25th.
+Starts Feb. 25th.
 
 | Feature | To be Assessed | % |
 | --- | ----------- | --- |
