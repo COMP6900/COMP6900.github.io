@@ -12,11 +12,11 @@ Windows and Linux esp. BSDs and Macos dont have this problem and are usually mor
 For windows, just LOL.<br/>
 For linux, well look gnome and kde aren't too bad.<br/>
 
-They work. But they could be better. KDE esp, so much promise i see. But damn the extra titlebar is like 90% of my complaints. Also the fact that linux graphics drivers are like low tier trash, even amd crashes frequently for me. IDK bro. I think they need some kind of wake up call.
+They work. But they could be better. KDE especially. But damn, the extra titlebar is like 90% of my complaints. Also the fact that linux graphics drivers are like 12m lines of code and crash every 2 hours. IDK, I wasnt really be bothered to read all the code but its not great. I think they need some kind of wake up call.
 
 ## BIOS and Low level graphics
 
-What?? They look like utter trash. Bootloader should be loading the graphics drivers off the bat to make it look as less shoddy as possible. TY.
+BIOSes look like you are trying to live record a crt monitor and stream it to your BIOS feed. The Bootloader should be loading the graphics drivers off the bat to make it look as good as possible as soon as possible.
 
 ## Software Suite
 

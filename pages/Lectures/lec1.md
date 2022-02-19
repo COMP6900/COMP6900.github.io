@@ -15,7 +15,10 @@ Is the info good?
 
 Does this count towards something?
 - I'll give you a certificate or something if you pass. Need at least 50% to pass.
-- To pass you have to show you understand what you're doing. Mostly assessment based with 35% final exam.
+- To pass you have to show you understand what you're doing. Mostly assessment based with a 35% final exam.
+
+Are there video lectures?
+- Of course. Uploaded to https://www.youtube.com/channel/UC6qO4W9BRAPpUOUD43aDDvA. Or alternatively in the Videos section which embeds the videos with a custom HTML5 player.
 
 ## What is COMP6900?
 Like a human body, a kernel can be thought of as an organism with different organs working together harmoniously to survive its environment. Its environment in this case is a messy ecosystem of code, apps, hardware and dumb users.
@@ -53,3 +56,46 @@ Week 13-15
 - Finals week
 - Revision material uploaded to comp6900.github.io/lectures/revision-22s1.html
 - Final exam, done completely online in comp6900.github.io/final/22s1
+
+## RISCV64GC
+In the risc world we deal with concepts like:
+- RISC pipeline (vs "hyperthreading")
+- ALU Load/Store instructions (vs Register-Memory)
+- Extensions, for floats, atomics, hypervisor (virtualisation), etc.
+
+### What the hell is RISCV64GC?
+The answer is RV64IMAFDZicsrZifenceiC
+- 64I: 64-bit integer extensions
+- M: Multiplication
+- A: Atomics
+- F: Floating Point (32-bit)
+- D: Floating Point (64-bit)
+- Zicsr: Control & Status
+- Zfencei: Extra Memory Fence/Protection
+- C: Compressed Instructions (16-bit)
+
+### Wait what is RISCV?
+- An open source ISA.
+- Much better than x86, objectively. I said so.
+- Upside: Simple, elegant, modular, extensible.
+- Upside: Less electricity goes into decoding the instructions (x86), so less power usage, though maybe more compiler work
+- Upside: Easier assembly. Dont have to remember a billion different instructions and 2 different syntaxes. In fact you can use the assembly syntax I made [To be uploaded soon].
+- Downside: More careful about cache since x86 programs tend to be smaller in size and can fit on CPU cache.
+
+## RISC-V Instruction Types
+The people at sifive seemed to realise the potential of hardware efficiency gains. So they came up with 6 different ways to encode a 32-bit riscv instruction.
+
+### R Format
+
+### I Format
+
+### S Format
+
+### SB Format
+
+### U Format
+
+### UJ Format
+
+
+Do you have to remember these? No. But you will have to implement it and `autotest` has to work so yea.
