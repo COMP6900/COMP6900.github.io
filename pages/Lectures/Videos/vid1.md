@@ -1,7 +1,9 @@
 ---
-layout: default
+layout: page
 title: Vid1
 parent: Videos
+grand_parent: Lectures
+nav_order: 1
 ---
 ## Lec 1 [NOT UPLOADED YET]
 

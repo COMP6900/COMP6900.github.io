@@ -2,6 +2,7 @@
 layout: default
 title: Lecture 1
 parent: Lectures
+nav_order: 2
 ---
 ## Week 1, Lec 1
 This is the greatest course, ever.
@@ -57,6 +58,14 @@ Are there video lectures?
 Like a human body, a kernel can be thought of as an organism with different organs working together harmoniously to survive its environment. Its environment in this case is a messy ecosystem of code, apps, hardware and dumb users.
 
 As a programmer, you need to know understand how a kernel survives its environment and mediates between stuff to achieve its goal.
+
+### Expected Course Marks
+
+@startmermaid
+pie title Mark Scores
+  "0": 50
+  "100" : 50
+@endmermaid
 
 ## Middleman Analogy
 Like a middleman, a kernel sits at a stand for any requests. When someone has a request, they go up to the middleman and asks for something. The middleman then sifts through their documents to find something that can satisfy their request. If it cant find an appropriate thing, then it will have to talk to other middleman on a lower level than it. And wait for them to reply back. And if they dont have it, they will have to talk to even lower middlemen.
