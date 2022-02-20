@@ -3,7 +3,7 @@ collections:
     output: true
 
 # comment this out when push for now
-theme: "just-the-docs"
+# theme: "just-the-docs"
 remote_theme: pmarsceill/just-the-docs
 search_enabled: true
 search:
