@@ -4,6 +4,7 @@ title: Asst1 - 22S1
 parent: Assignments
 ---
 ## Assignment 1: CPU, Bootloaders and Memory <strong>[Draft]</strong>
+
 Starts Feb. 25th. Due in 2 metric weeks.
 
 | Feature | To be Assessed | % |
@@ -13,7 +14,9 @@ Starts Feb. 25th. Due in 2 metric weeks.
 | *Paging* | Code in C only. No C++, Rust, etc. Needs to interface with CSR VM register (CSR2) equivalent in riscv. Pages are 4K each and constitute a 48bit virtual memory/52-bit physical memory scheme. A specified linked list allocator in `autotest` must be able to use your paging scheme. | 30% |
 
 ## Tools
+
 You will need:
+
 - Test: `autotest` -> `cargo install autotest-6900`
 - Run: `qemu`
 - Build: `rustup`, `gcc-x86_64`, `gcc-riscv64`
@@ -60,11 +63,13 @@ fi
 ```
 
 ## Assessment
+
 As the dictator of the course, I will be marking.
 
 ### Criteria
+
 | Feature | Does it pass the autotests? |
-| --- | ----------- |
+| --- | --- |
 | *RISCV64GC ISA* | Yes = 100%, No = 0% |
 | *UEFI Bootloader* | Yes = 100%, No = 0% |
 | *Paging* | Yes = 100%, No = 0% |

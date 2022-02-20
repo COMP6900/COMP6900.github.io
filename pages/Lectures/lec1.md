@@ -2,6 +2,7 @@
 layout: default
 title: Lecture 1
 parent: Lectures
+nav_order: 2
 ---
 ## Lec 1
 This is the greatest course, ever.
@@ -57,6 +58,14 @@ Are there video lectures?
 Like a human body, a kernel can be thought of as an organism with different organs working together harmoniously to survive its environment. Its environment in this case is a messy ecosystem of code, apps, hardware and dumb users.
 
 As a programmer, you need to know understand how a kernel survives its environment and mediates between stuff to achieve its goal.
+
+### Expected Course Marks
+
+@startmermaid
+pie title Mark Scores
+  "0": 50
+  "100" : 50
+@endmermaid
 
 ## Middleman Analogy
 Like a middleman, a kernel sits at a stand for any requests. When someone has a request, they go up to the middleman and asks for something. The middleman then sifts through their documents to find something that can satisfy their request. If it cant find an appropriate thing, then it will have to talk to other middleman on a lower level than it. And wait for them to reply back. And if they dont have it, they will have to talk to even lower middlemen.
@@ -194,7 +203,7 @@ We keep talking about what we *do* need, and end up with a mess known as linux. 
 ## Rei: Language of Systems
 Rei is a language that Im making to demonstrate how code works in a simplistic manner. Here is a chunk of rei code:
 
-```rei
+```
 fn f() = {
     println("Hi!")
 }
@@ -261,6 +270,8 @@ class String {
 - NO SEMICOLONS OR ANY OTHER JUNK SYNTAX STUFF
 - Builtin OOP and Functional paradigms. Recommended to use OOP whenever possible and return `self` as a reference
 - NO WEIRD, BAD, MESSY STUFF. Stuff like C++ where you have 30 lines of template code and C headers where you have:
+<br/>
+
 ```c
 extern a;
 extern __A;
@@ -278,6 +289,7 @@ typedef Y __y
 #define DO do(__x, __y)
 #define DO_X __do_x(x, y)
 ```
+
 - Philosophy 1: No junk headers filled with externable variables and half assed declarations.
 - Philosophy 2: Modular and structured code with the `package` keyword and more complex directory hierarchies rather than a single file that contains everything.
 - Philosophy 3: Simple, readable syntax that makes sense right away and doesnt need 50 lines of comments before a function to state what it is trying to do. Utilise the `std` library where possible instead of your own 10-minute hacky solutions.
