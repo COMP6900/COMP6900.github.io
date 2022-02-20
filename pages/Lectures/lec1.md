@@ -3,7 +3,7 @@ layout: default
 title: Lecture 1
 parent: Lectures
 ---
-## Week 1, Lec 1
+## Lec 1
 This is the greatest course, ever.
 
 ## Course Structure
