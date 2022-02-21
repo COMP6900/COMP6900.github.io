@@ -41,7 +41,7 @@ The PLIC provides flexibility to multiple CPUs on a system. For multiple HARTs, 
 
 Example: Within the Controller Firmware
 
-```arm
+```
 .align 2
 .global handler_table_entry
 
