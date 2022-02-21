@@ -8,7 +8,7 @@ parent: Lectures
 
 What is life other than to suffer?
 
-## Bootloaders
+# Bootloaders
 
 Bootloaders are a magnificent beast.
 
@@ -91,3 +91,14 @@ void software_handler() {
 ```
 
 ## Interrupt CSR
+Control and Status Registers are heavily used for interrupt logic and setup.
+- CSR2 for x86
+
+# RISC-V Architecture
+
+Lets talk about RISC-V architectural features
+
+## Assembly Line Architecture
+They call it 'Pipelining', but in COMP6900, I will be referring to it as an 'Assembly Line'
+
+
