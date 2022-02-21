@@ -3,33 +3,44 @@ layout: default
 title: Lecture 2
 parent: Lectures
 ---
+
 ## Lec 2
+
 What is life other than to suffer?
 
 ## Bootloaders
+
 Bootloaders are a magnificent beast.
 
 ## RISC-V Interrupt Controllers
+
 We start with an interrupt controller which directs hardware generated interrupts to the CPU as a formatted request.
+
 ### Local Interrupt Controllers
 
 SiFive provides two designs: a 'core local interrupter' or a 'core local controller'. Both require the `mtime`, `mtimecmp` registers for timer interrupts, and `msip` to configure software generated interrupts.
 
 Core local interrupters or CLINT:
+
 - a compact, fixed priority design. Support for preemptive interrupt controls from high privilege levels of HART
 - simple interrupter for software and timer interrupts, does not control other local interrupts
 
 Core local interrupt contoller or CLIC:
+
 - fully featured with config options. Supports programmable interrupt levels and priorities
 - supports nested, preemptive interrupts. Based on interrupt level and priority configuration. And within a given privilege level
 
 ### Global Interrupt Controllers
+
 The PLIC provides flexibility to multiple CPUs on a system. For multiple HARTs, you will need a PLIC to handle higher level interrupts that affect multiple threads or have complex functionality like randomised handling.
+
 - Runs on a different clock compared to the Local controllers
 - Each global interrupt has a priority programmable register. The registers have a unique ID to map to an interrupt.
 
 ## Interrupt Handler
+
 Example: Within the Controller Firmware
+
 ```arm
 .align 2
 .global handler_table_entry
@@ -61,6 +72,7 @@ mret
 ```
 
 Handler for CLINT:
+
 ```c
 #define MCAUSE_INT_MASK 0x80000000
 #define MCAUSE_CODE_MASK 0x7FFFFFFF
