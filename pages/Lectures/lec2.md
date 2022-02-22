@@ -91,7 +91,9 @@ void software_handler() {
 ```
 
 ## Interrupt CSR
+
 Control and Status Registers are heavily used for interrupt logic and setup.
+
 - CSR2 for x86
 
 # RISC-V Architecture
@@ -99,6 +101,12 @@ Control and Status Registers are heavily used for interrupt logic and setup.
 Lets talk about RISC-V architectural features
 
 ## Assembly Line Architecture
+
 They call it 'Pipelining', but in COMP6900, I will be referring to it as an 'Assembly Line'
 
+# Gaming on Neutron
 
+Neutron uses a framework called Terraformer3D for developing games optimised for Neutron@RiscV.
+
+- We assume that games are 99% of the time: 3D based, assets created in mainstream editors like Blender and Maya, uses a single Window (ArcWindow), game devs know how to code in vulkan and wgpu.
+- For most graphics programming, wgpu is used as a rust-based framework that wraps around the underlying Vulkan drivers on Neutron. For most things, wgpu should be enough, though if the dev wishes to leverage more control that vulkan offers, they can write vulkan `.vs,.fs,.gs` shaders and link them via vulkano-rs.
