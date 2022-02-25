@@ -12,9 +12,39 @@ What is life other than to suffer?
 
 Bootloaders are a magnificent beast.
 
+## Supervisor Binary Interface (SBI)
+
+The RISCV SBI sits between the bootloader and the kernel. It is used as a platform agnostic way of doing basic setup code before loading a kernel image into memory and handing off control to it
+
+In riscv fashion, the bootloader should set up an SEE (Supervised Execution Environment) for which the kernel code can run in. The kernel is simply a program and if it just ran on bare metal with hardly any abstractions, it wouldnt be great to code for. So instead the bootloader sets up some abstractions in memory and inspects ACPI for devices to create data structures which are more helpful for the kernel code to use.
+
+THe kernel interacts with the SBI interface through these fields:
+
+```c
+// return value of all SBI functions
+struct sbiret {
+    long error; // 0,-1,...-8
+    long value;
+}
+```
+
+- when calling `ecall`, store the SBI extension ID within `a7`. Should also store the SBI function ID in `a6`
+
+There is an implementation of SBI that runs on M mode, [here](https://github.com/rustsbi/rustsbi)
+
+- should be used as a dependency for your bootloader/kernel
+
+### SBI Extensions
+
+A bunch of very nice extensions like system timers, console reads and writes, fence instructions, shutdown the system, and functions to get the SBI extensions available for a kernel to use
+
+- around 11 total extension sets available. Only 7 or so seem noteworthy for a standard implementation. Some of them are experimental and some are made for vendors to extend themselves. There are also some that are specific to the firmware itself
+- a legacy set exists for kernels that have older designs. Its not a bad idea to implement
+- The most important ones seem to be: **Base**, **Timer**, **IPI** (interprocess interrupt), **RFENCE** (Instruction execution or memory accesses are forced to execute in a specific order, without out-of-order stuff), **HART state management** (start, stop, status, suspend), **reset system**, **performance monitoring** of hardware like disk, cpu, ram, gpu, etc (stuff like list of events, counters)
+
 ## RISC-V Interrupt Controllers
 
-We start with an interrupt controller which directs hardware generated interrupts to the CPU as a formatted request.
+An interrupt controller directs hardware generated interrupts to the CPU as a formatted request.
 
 ### Local Interrupt Controllers
 
@@ -101,7 +131,8 @@ Control and Status Registers are heavily used for interrupt logic and setup.
 
 ## Interrupt Instruction
 
-For a userspace application to invoke a syscall in riscv, they use the `ecall` instruction which jumps into supervisor mode.
+For a userspace application to invoke a syscall in riscv, they use the `ecall` instruction which jumps into supervisor mode. ECALL = Executive Call.
+
 - This normally starts by storing the registers (app) on the stack. Note by making an `ecall` instruction, we went from virtual addressing to physical addressing within the kernel. So we are storing the app's registers on the kernel stack, usually starting at a relatively high frame addr. Note, some services wont need to use registers at all and only manipulate memory directly. In this case the registers do not need to be saved.
 - It then captures specific registers like `pc` and the current privilege level, and set the cause of the interrupt from the syscall API register to the `mcause` register. Then it checks if the interrupt was a page fault, which means `mtval` reg needs to hold the virtual address which the process tried to access.
 - Now it can turn off interrupts and look up an IDT for the interrupt number and handler function. Then it simply jumps to that interrupt handler function
