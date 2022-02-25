@@ -94,7 +94,37 @@ void software_handler() {
 
 Control and Status Registers are heavily used for interrupt logic and setup.
 
-- CSR2 for x86
+- CSR2 for x86. Supervisor mode only, no "machine mode"
+- For RISCV, `m` instructions like `mie` to enable interrupts and `mcause` to specify an interrupt code
+- `s` for supervisor mode, i.e. kernel mode. Basically machine mode but with virtual addressing available. MMU is functional and TLB flushing is possible
+- `h` for hypervisor mode. Basically a minimal translation scheme with minimal overhead, much better than a full software emulator. Also an extra layer for address translations. The `h` instructions would be able to efficiently use the host resources without affecting other guests. They do so by 'almost' running on bare metal, in a specialised "hypervisor" environment with extra containerisation. More info on [hardware assisted virtualisation](https://en.wikipedia.org/wiki/Hardware-assisted_virtualization).
+
+## Interrupt Instruction
+
+For a userspace application to invoke a syscall in riscv, they use the `ecall` instruction which jumps into supervisor mode.
+- This normally starts by storing the registers (app) on the stack. Note by making an `ecall` instruction, we went from virtual addressing to physical addressing within the kernel. So we are storing the app's registers on the kernel stack, usually starting at a relatively high frame addr. Note, some services wont need to use registers at all and only manipulate memory directly. In this case the registers do not need to be saved.
+- It then captures specific registers like `pc` and the current privilege level, and set the cause of the interrupt from the syscall API register to the `mcause` register. Then it checks if the interrupt was a page fault, which means `mtval` reg needs to hold the virtual address which the process tried to access.
+- Now it can turn off interrupts and look up an IDT for the interrupt number and handler function. Then it simply jumps to that interrupt handler function
+- Within the interrupt handler function, it would do what it needs to, usually some IO task. From first principles, it is possible to wait on the IO to finish on another kthread and resume execution of the userspace program if it has other things to do too. Or else simply call the service on another user thread, which would be handled by a different kernel thread
+- After the service is completed, the kthread restores the app's registers from the kernel stack and transfers execution back to the user thread that called the service. It would need to also restore the PC and other things that have been changed within the kernel
+
+There can also be conventions for programs to not use a specific register at all or expect to be always temporary so a quick service can simply use that one. Hence the handler would not have to store all the registers
+
+## Hypervisors
+
+For VMs, we could instead code a userspace hypervisor that provides a minimal translation layer from the VM syscalls to the host syscalls. This has the advantage of being simpler to code and run since you already have a running OS that you know is working.
+
+Note `h` is built for type 1 hypervisors which benefit from a minimal host layer and almost bare metal. A vm running on a type 1 hypervisor will still have to make syscalls and interrupt into a privileged mode, so its not a complete do-all kind of thing. For some applications like XBox, it could make sense to run multiple apps as separate vm containers on a type 1 hypervisor. But on a normal PC being used by a single person for multitasking and performance related things, and only cares about speed and reliability, its not really something that makes sense to replace over a `supervisor` mode.
+
+### Type 1 Hypervisors
+
+- A type 1 hypervisor is more efficient and possibly more secure since there is a very limited gap between the VM and the hardware that an attack can exploit to compromise the system
+- But it is usually more of a hassle to set up and may require another machine to manage it well. Windows Hyper-V is great at doing this on its own platform, (I'll add more on this later)
+
+### Type 2 Hypervisors
+
+- Basically an app in userspace. Can be quicker and easier to setup/access than type 1 vms. For normal users that may want extra safety/security for certain tasks and if they want to test out something. Would be great to test out an OS on a type 2 hypervisor as it is quite safe (Note "safety" doesnt equal "security")
+- Even though in practice would be safer and even more secure in some areas, has more gaps between it and the hardware as an attacker can go for the host OS as well. Also never as fast as a type 1 hypervisor, should expect considerable latency with services and devices
 
 # RISC-V Architecture
 
