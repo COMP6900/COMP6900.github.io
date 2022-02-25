@@ -3,7 +3,7 @@ layout: default
 title: Asst1 - 22S1
 parent: Assignments
 ---
-## Assignment 1: CPU, Bootloaders and Memory <strong>[Draft]</strong>
+## Assignment 1: CPU, Bootloaders and Memory <strong>[v1]</strong>
 
 Starts Feb. 25th. Due in 2 metric weeks.
 
@@ -26,7 +26,6 @@ I will post a script that will detect your OS and download and install the requi
 
 ```bash
 #!/bin/bash
-#[draft]
 
 if [ -os Windows ] then
     # RUST
@@ -37,8 +36,9 @@ if [ -os Windows ] then
 
     # MSYS64
     # install msys64
-    wget <msys64> ~/Downloads
-    exec ~/Downloads/<msys64>
+    MSYS2_LINK="https://repo.msys2.org/distrib/x86_64/"
+    wget $MSYS2_LINK ~/Downloads
+    exec ~/Downloads/$MSYS2_LINK
     # wait for it to complete install
     # start it, should be added to path
     source ~/.bashrc
@@ -57,14 +57,18 @@ if [ -os Windows ] then
     echo "DONE!"
 fi
 
-if [ -os Unix ] then
-    <same as windows except no msys64 but brew or download with apt/pacman/fedora/etc>
+if [ -os Ubuntu ] then
+    sudo apt install rustup riscv64-unknown-elf-bintuils riscv64-unknown-elf-gcc qemu
+fi
+
+if [ -os Mac ] then
+    brew install rustup riscv64-unknown-elf-bintuils riscv64-unknown-elf-gcc qemu
 fi
 ```
 
 ## Assessment
 
-As the dictator of the course, I will be marking.
+As the dictator of the course, I will be deciding the final marks. The `autotest` script should decide 99.99% of the marks.
 
 ### Criteria
 
