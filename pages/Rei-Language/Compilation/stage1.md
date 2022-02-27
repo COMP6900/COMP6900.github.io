@@ -282,6 +282,181 @@ Note the spaces shouldnt important in the this case. `1.1` should be the same as
 
 ## How to recognise Tokens
 
+So how to take the patterns for all the needed tokens and built a piece of code that examines the input string. And finds a prefix that is a lexeme matching one of the patterns?
 
+Example for branching statements:
+
+```
+statement -> if expr then statement
+        |     if expr then statement else statement
+        |     epsilon
+expression -> term relop term
+        |     term
+term  -> identifier
+        |     number
+```
+
+`relop` -> use the comparison operators of languages like Pascal or SQL where = is "equals" and <> is "not equals"
+
+Terminals of the grammar:
+
+- `if`
+- `then`
+- `else`
+- `relop` (relational operator)
+- `identifier`
+- `number`
+
+We can then describe these tokens as patterns:
+
+```
+digit -> [0-9]
+digits -> digit+
+number -> digits(.digits)?(E[+-]?digits)?
+letter -> [A-Za-z]
+id -> letter(letter|digit)
+if -> if
+then -> then
+else -> else
+relop -> < | > | <= | >= | = | <>
+```
+
+The lexical analyser recognises the keywords `if, then, else` and lexemes that match `id, relop, number`. We can also say that the keywords themselves (proper string) are not identifiers, i.e. they are "reserved words"
+
+Then we assign the lexer the job of stripping out whitespaces by recognising the pseudo token `ws`:
+
+```
+ws -> (blank|tab|newline)+
+```
+
+So `ws` is a special token that we use for the lexer only, and do not pass to the parser. It is used for recognising lexemes
+
+- For the 6 relational operators, symbolic constants `LE`, `LT`, etc. are used for the attribute value. This allows us to indicate which instance of the token `relop` we found without ambiguity
+
+| Lexeme | Token | Attribute |
+| --- | --- | --- |
+| any `ws` | - | - |
+| if | if | - |
+| then | then | - |
+| else | else | - |
+| any `id` | id | symtab pointer |
+| any `number` | number | symtab pointer (for immediates) |
+| < | relop | LT |
+...
+
+### Transition Diagram
+
+It is helpful to fist convert each pattern into stylised flowcharts called TDs. TDs have a collection of nodes/circles called 'states'
+
+- each state represents a condition that could occur during the process of scanning the input looking for a lexeme that matches one of several patterns
+- a state basically summarises all we need to know about what characters we've seen between `lexeme_begin` and `forward`
+
+Edges between states represent transitions. They are labeled by a symbol or a set of symbols
+
+- if in state `s` and the next input symbol is `a`, we look for a possible edge `a` out of `s`. If `a` exists, advance `forward` and enter the state of the diagram to that node
+
+Assume that our TD is deterministic. So there is never more than one edge out of a given state. As long as that state has a given symbol among its labels
+
+- this isnt strictly necessary
+
+If a state is `final` or `accepting`, then a lexeme has been found. The actual lexeme might not consist of all positions between `lexeme_begin` and `forward`
+
+- an accepting state is a double circle instead of a single circle
+- we can attach an action like returning a token : attribute pair to the parser to the accepting state
+
+If we have to retract the `forward` pointer one position back, then we place a `*` near that accepting state. In the above patterns, we dont have to retract more than once
+
+- if we did then we simply just attach `n` * for `n` steps backward to that nearest accepting state
+
+The `start` or `initial` state is indicated by an edge labeled `start` entering from nowhere
+
+### Example: TD for relop
+
+We start at state `0` from nowhere. From there, we can transition to 3 different states:
+
+- state 1 `<`
+- state 5 `=` : `EQ`
+- state 6 `>`
+
+This means if we get to states 1 and 6, there are more options depending on subsequent characters. But if we see `=` from nothing, then we know for sure that can only be recognised as the EQ operator
+
+State 1 has 3 more transitions, all of which are accepting
+
+- `=` : LE
+- `>` : NE
+- `*` : LT
+
+As you can see from our specified relop patterns, this makes a lot of sense since there are no other ways to tokenise
+
+- if we started at state 0 and did not see a valid transition, then that means our current TD we are using is wrong. So we could e.g., use another one. This doesnt apply after state 0 since `*` captures everything before the next `ws`
+
+### Recognising reserved words vs identifiers
+
+This is a key problem. `if` and `then` are usually reserved and if found by themselves, should be treated as reserved words rather than `identifiers`. So the problem is they can be treated as both
+
+- in our reserved word and id TD, we start from nowhere and have a single possible transition to state 10 if we see a `letter`
+
+Now heres the thing. We loop the edge of state 10 to itself if we see a `letter|digit`. If we see something else, we return the lexeme with the functions `get_token()` and `install_id()`
+
+- but how do we handle reserved words that look like an `id`? Well it all lies in `get_token` and `install_id`. If there is no matching entry, then the token must be an ordinary `id`
+
+Method 1: Install the reserved words in the symtab beforehand. A field of the symtab indicates that these strings are not ordinary `identifiers`. Then `get_token()` examines the symtab entry for the lexeme found, and returns that value
+
+Method 2: Create separate TDs for each keyword. So we prioritse the tokens so that the reserved word tokens are recognised in preference to `id`. This is not a great idea
+
+### Example: TD for Numbers
+
+Numbers are usually the more complex ones since we have optionals and a lot of stuff
+
+- it is still possible to create a transition diagram
+
+Note a TD for whitespaces is quite simple. We have a single possible transition from start if we see a `ws` char. Then we loop back onto the same node if we see another `ws` until we dont. Then we can terminate
+
+## Building a TD-based Lexical Analyser
+
+We can actually build a lexical analyzer from a bunch of different transition diagrams
+- the key thing to see is that each state is represented by a piece of code. So a variable `state` holds the number of the current state for a TD. Then we have a bunch of states to choose from depending on the current state object and the next character
+- often the code for a state itself is simply a switch statement or multiway branch that determines the next state by examining the next input char
+
+### Simulating Relop TD
+
+```
+fn get_relop() -> Token {
+    let ret_token = Relop()
+    let state = 0
+    let c = ''
+
+    loop {
+        switch state {
+            0 => {
+                c = next_char()
+                if c == '<': state = 1
+                elif c == '=': state = 5
+                elif c == '>': state = 6
+                else fail()
+            },
+            1 => {}
+            ...
+            8 => {
+                // retract the forward pointer and return
+                // so the next time it can start from 'nowhere'
+                retract()
+                ret_token.attribute = Attribute::GT
+                return ret_token
+            }
+        }
+    }
+}
+```
+
+`fail()` could initiate an error correction phase that will try to repair the input if there is no other unused TD that works on the current sequence
+- state 8 bears `*` so we must retract the `forward` pointer one position
+
+Now you can see how this fits into the whole lexer:
+- arrange for the TDs for each token to be tried sequentially. Then `fail()` resets `forward` to `lexeme_begin` and starts the next TD. So we can use TDs for individual keywords. Only have to use these before we use the diagram for `id` for keywords too, which would be great
+- OR we could run the various TDs in parallel. So we feed the next input character to all TDs on their separate threads. Then each of them can make whichever transitions they wanted. But we must be careful when we have to resolve when one diagram finds a lexeme that matches but other diagrams yet to find a match. So we could take the longest prefix of the input that matches any pattern, and thus prefer an identifier token `thenext` instead of `then` or operator `->` to `-`. This should work almost 100% of the time by the sound of it
+- OR the best approach. Combine all the TDs into one. Allow the TD to read input until there is no possible next state. Then take the longest lexeme that matches any pattern. The example patterns should be quite easy. We could combine states `0,9,12,22` into a single state `valid_char` and leave other transitions intact
+
+BUT: it is quite a bit more complex to combine TDs for several tokens
 
 ## Syntax Analysis
