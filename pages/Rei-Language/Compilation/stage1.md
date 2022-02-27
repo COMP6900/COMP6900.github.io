@@ -14,7 +14,7 @@ We usually tokenise and parse a long string (e.g. combining files into namespace
 
 This IR is closer to machine code and can be further analyzed and optimised, e.g. LLVM. Finally it can be assembled into actual machine code for a certain platform, e.g. x86_64 linux elf
 
-## Lexical Analysis
+# Lexical Analysis
 
 Lexical analyzers do two things: Scanning and Lexing. They basically tokenise a fixed sequence of input data into a list of key: value pairs representing a list directives/instructions
 
@@ -75,7 +75,7 @@ we have several things:
 
 The answer is we dont. The lexer's job is to produce tokens -> label: attribute pairs of 'preliminary' meaning within the syntax itself or "local sequences", not check for semantics. To do that, we would have to pass them onto the parser that checks for meaning from the entire syntax and context for the list of tokens
 
-### Error Recovery
+## Error Recovery
 
 Maybe a sequence of characters makes the analyzer unable to proceed since none of the patterns for tokens matches any prefix of the reamining input. This can happen, but idk how. To recover we can:
 
@@ -178,6 +178,7 @@ The sentinel character is a special char that cannot be part of the source progr
 ### Specification of Tokens
 
 Lexemes should be short like in most languages. Usually one-two character lookahead is good enough
+
 - so a buffer size N = 4096 is ample, though some problems like character string literals may extend over many lines. This means the lexeme can be longer than N
 - to solve this, we can treat them as a concatenation of each line. We can simply use something like the `+` operator before each line end to concat the next line's string, and do so in the lexer program
 - but when arbitrarily long lookaheads are needed, you can treat keywords like `fn` as identifiers rather than actual keywords. Then let the parser resolve the full meaning in conjunction with a namespace level symbol table
@@ -218,6 +219,68 @@ So a `language` is any countable set of strings `s` over some fixed alphabet `A`
 `proper` prefix or suffix -> results that are not $\epsilon$ or `s` itself \
 `subsequence` -> delete $\geq 0$ symbols that are not necessarily consecutive
 
+To concatenate strings, we represent them like `ss`
+
+### Operations on Languages
+
+Note position does matter in a string, so we talk about permutations on strings.
+
+A bunch of set theory like unions and closures. Know that $L^4$ means set of all 4-letter strings in language $L$.
+
+L U D means set of letters and digits. 62 in the English Language.
+
+L* means set of all strings of letters. So if you can imagine an infinite set of strings that contain all the possible letter permutations.
+
+L(L U D)*-> (L U D)* means the set of strings containing all possible letter and digit permutations. L means set of letters. So the whole thing means strings with a letter in the first position and any letter+digit permutation afterwards.
+
+D+ is the set of all strings with $\geq 1$ digit
+
+## Regex
+
+Each regular expression $r$ represents a language $L(r)$. $r$ can then be defined recursively by $r$'s subexpressions
+
+Most languages have identifiers that begin with a letter can contain letters, numbers and underscores:
+
+r"[\l_][\l_\d]"
+
+$\epsilon$ is a regular expression of "" and $L(\epsilon) = \{\epsilon\}$ \
+if $a$ is a symbol in `ALPH` then $a$ is a regular expression. This also means $L(a) = \{a\}$ -> same idea as $\epsilon$
+
+- $(r)|(s)$ is a regex denoting the language $L(r) \cup L(s)$
+- $(r)(s)$ denotes $L(r)L(s)$ concatenated alternatives
+- $(r)*$ denotes $L(r)^*$
+- $(r)$ denotes $L(r)$ -> basically we can add additional pairs of brackets without changing the language it represents
+
+### Order of precendence
+
+\* > concat > |
+
+### Extensions of Regex
+
+- `+` -> one or more instances of the previous group. Called the 'positive' closure `(r)+` denoting `L(r)+`
+- `?` -> zero or more instances
+- $a_i$  -> character classes where a_1 | a_2 ... a_n can be replaced with `[a_1a_2...a_n]`. So `[abc]` means `a | b | c`
+
+### Regular Definitions
+
+We can give names to certain regular expressions and use their names in subsequent expressions. We can also define the set of values which the regex maps to
+
+Examples:
+
+`letter -> A | B | C ... | Z | a | b | ... | z |`\
+`digit -> 0 | 1 | ... | 9`\
+`underscore -> _`\
+`identifier -> (letter|underscore)(letter|underscore|digit)*`
+
+Example of optionals:
+
+`optional_fraction -> .digit+|eps`\
+`optional_exp -> (E(+|-|eps)digit+)|eps`\
+`number -> digit+ optional_fraction optional_exponent`
+
+Note the spaces shouldnt important in the this case. `1.1` should be the same as `1 . 1` and `1E+10` is the same as `1 E + 10`. But they are, so only the no space ones are taken, i.e. `1.1` and `1E+10` for simplicity sake
+
+## How to recognise Tokens
 
 
 
