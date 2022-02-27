@@ -152,4 +152,73 @@ liked that one.<P>
 <tag_P_end>
 ```
 
+### Input Buffering
+
+We should buffer the inputs to know for sure the most encapsulated lexeme. The most prioritised token should be mapped to a certain lexeme
+
+- we cannot be sure a sequence is an `identifier` until we see the end of the character that does not belong to the `identifier` pattern. So space, operator, etc
+- we cannot be sure a single character operator like `=` doesnt actually mean `==` when we look at the next character. Also non existent operators like `===` which should bring about an error or `unidentified` tag
+
+### Buffer Pairs
+
+We start with two lexeme buffers that are reloaded one after the other. Each buffer is of size `N`, e,g, a page size like 4KiB. So we can read a disk block into RAM at a time. Two virtual pages are mapped to these buffers which the analyzer can use to `read()`
+
+- we know that a page contains the end of the source file if it contains `eof` or is less than size `N`
+
+We then keep 2 pointers, `lexeme_begin`, `forward`. These point to the beginning of the current lexeme and a scanner that keeps moving forward until a pattern match is found
+
+So when the next lexeme is determined, `forward` is set to the character at its right end. We record that lexeme as an attribute value of a token returned by the parser. And set `lexeme_begin` to the character right after `forward`
+
+- we will never overwrite the lexeme in its buffer before determining it. As long as we dont look ahead of the current lexeme so that L + D > N
+
+### Sentinel
+
+The sentinel character is a special char that cannot be part of the source program. We usually use `eof`. We combine the buffer-end test with the test for the current character by making each buffer hold `eof` at the end. If we moved off the current buffer, we must load the next buffer
+
+### Specification of Tokens
+
+Lexemes should be short like in most languages. Usually one-two character lookahead is good enough
+- so a buffer size N = 4096 is ample, though some problems like character string literals may extend over many lines. This means the lexeme can be longer than N
+- to solve this, we can treat them as a concatenation of each line. We can simply use something like the `+` operator before each line end to concat the next line's string, and do so in the lexer program
+- but when arbitrarily long lookaheads are needed, you can treat keywords like `fn` as identifiers rather than actual keywords. Then let the parser resolve the full meaning in conjunction with a namespace level symbol table
+
+Lexical analysers are basically regex engines that convert regular expressions into algorithms that perform token recognition
+
+Let us look at an alphabet, which is a finite set of symbols. ASCII is an important set that we can use to build a programming language. Now consider a lookahead code:
+
+```
+switch forward {
+    case eof:
+        if foward.index == buffer_1[N-1]:
+            reload buffer_2 // call read() on the next sequence
+            forward = buffer_2[0]
+        elif foward.index == buffer_2[N-1]:
+            reload buffer_1
+            forward = buffer_1[0]
+        else:
+            exit
+    case 'A'
+    ... // other chars
+}
+```
+
+- multiway branches like the switch statement can be compiled in a single shot by simply storing each case's address in a lookup table and calculating a perfect hash function (randomised) for it
+
+$\epsilon$ -> empty string \
+$s$ -> non-empty string \
+$|s|$ -> length of $s$
+
+So a `language` is any countable set of strings `s` over some fixed alphabet `A`.
+
+### Parts of a String
+
+`prefix` -> any string obtained by removing $\geq 0$ symbols from the end of `s` \
+`suffix` -> from the start \
+`substring` -> deleting any prefix and any suffix from `s` \
+`proper` prefix or suffix -> results that are not $\epsilon$ or `s` itself \
+`subsequence` -> delete $\geq 0$ symbols that are not necessarily consecutive
+
+
+
+
 ## Syntax Analysis
