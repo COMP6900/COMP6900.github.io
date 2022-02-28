@@ -29,10 +29,10 @@ Lexeme -> sequence of chars in the source that matches the pattern for a token. 
 
 | Token | Description | Examples |
 | --- | --- | --- |
-| let | r"let" | `let` |
-| identifier | r"[\w\W]{1}[\w\W\d]+" | `val`, `student_id` |
-| numeric | r"\d{0-1}\.{0-1}+\d+" | 0, 4.055215, -90251 |
-| literal string (with newlines) | r"\\"[.*\n]+\\""| "Hello, World!" |
+| let | `reg"let"` | `let` |
+| identifier | `reg"[\w\W]{1}[\w\W\d]+"` | `val`, `student_id` |
+| numeric | `reg"\d{0-1}\.{0-1}+\d+"` | 0, 4.055215, -90251 |
+| literal string (with newlines) | `reg"\\"[.*\n]+\\""`| "Hello, World!" |
 
 So 1 token represents all its identifiers, though one or more tokens can represent a constant
 
@@ -594,9 +594,7 @@ while (condition) statement
 
 then we can use:
 
-```
-while/\(.*\)[\{{letter}]
-```
+`while/\(.*\)[\{letter]`
 
 Note it would be a bit of a problem if there was a new line `\n` within the condition or before/after the condition:
 
