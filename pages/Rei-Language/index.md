@@ -168,3 +168,7 @@ macro DoThis {
     }
 }
 ```
+
+NOTES:
+- for rei v1, we just stick to a single syntax and thus lexer-parser without needing to change things up too much, just extend. I hope there are no glaring issues. So we only make a release if there is no big issues
+- if there are any big issues later on that are slowly found (or hopefully not found hardcore), then we can make rei v2 with a different lexer-parser

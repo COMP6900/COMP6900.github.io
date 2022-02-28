@@ -459,4 +459,153 @@ Now you can see how this fits into the whole lexer:
 
 BUT: it is quite a bit more complex to combine TDs for several tokens
 
+## Lex
+
+`flex` is an implementation of a UNIX tool `lex` for specifying regular expressions to ultimately generate a lexical analyser
+
+- transforms input patterns into a single TD. Then generates the code for it in `lex.yy.c` that simulates that TD
+
+First specify an input `.l` file in the lex syntax. The resulting program `a.out` takes in string sequences and outputs tokens. These tokens can then be fed into a parser (like bison)
+
+- attribute values for each token are placed in a global structure `yylval`. This can be shared between the lexical analyser and parser
+
+### Structure of a Lex Program
+
+```
+declarations
+%%
+translation rules
+%%
+supporting functions
+```
+
+The declarations portion should be used for declaring variables, 'manifest constants' and regular definitions.
+The translation rules have the form:
+
+```
+Pattern { Action }
+```
+
+Patterns are regular expressions. Actions are C code. Patterns may use declared variables.
+The supporting functions can be used in the translation rule actions. Or they can be compiled separately and used in the compiled C file
+
+
+When we create a lexical analyser instance, it should interact with the parser. How it does this:
+- when called by the parser, the lexical analyser code begins reading its remaining input 1 char at a time. It stops when it finds the longest prefix of the input that matches one of the patterns `P_i`
+- then it executes the associated Action code `A_i`. It then returns to the parser
+- if it does not, then maybe the lexer has found a `ws` or something. Then it will proceed to find additional lexemes until one of the corresponding actions causes a return to the parser
+- the lexical analyser returns a single value: the token name to the parser. It uses the global `yylval` to pass addition info about the lexeme like attributes
+
+Basically, it works like a single TD
+
+```
+IF, LT, THEN ...
+
+delim [ \t\n]
+ws {delim}+
+letter [A-Za-z]
+digit [0-9]
+id {letter}({letter}|{digit})*
+number {digit}+(\.{digit}+)?(E[+-]?{digit}+)?
+
+%%
+
+{ws} { }
+if {return(IF);}
+...
+{id} { yylval = (int) installID(); return(ID); }
+{number} { yylval = (int) installID(); return(NUMBER); }
+"<" { yylval = LT; return(RELOP); } 
+
+%%
+
+int installID() {}
+int installNum() {}
+```
+
+### Prioritisation and Conflict resolution
+
+So when lex encounters several prefixes of the input that match one or more patterns:
+- always prefers a longer prefix to a shorter prefix
+- if longest possible prefix matches 2 or more patterns, prefer the pattern listed first
+
+### Lookahead Operator
+
+Lex automatically reeads one char ahead of the last char that forms the selected lexeme, as expected
+- then retracts the input so only the lexeme itself is consumed in the input string
+- but what if we want to "look ahead", i.e. for patterns that should only be matched when a previous pattern had been found
+- so we use the `/` operator. In regex, this is also `?!` for negative and `?=` for positive
+
+How `/` works:
+- what follows `/` is an additional pattern that must be matched before we can decide that the token in question was seen. But the second pattern does not form part of the lexeme
+
+### Example: Unreserved Identifiers
+
+If we have:
+```
+IF(I,J) = 3
+```
+as an array index operator, we may run into some problems. Typically we want something like:
+```
+IF(condition) THEN ... ENDIF
+```
+- Note we usually dont worry about the ENDIF part in the lexer. That would be the parser's job
+
+But we can sure that an `IF` keyword is always followed by a left bracket, text describing a condition. But the text describing the condition can also be followed by identifiers, other brackets and operators. So to be very general:
+
+```
+IF/\(.*\){letter}
+```
+
+- the lexeme matches just the two letters `IF` iff the right stuff comes after it
+- this can only match the keyword `IF` if the programmer coded correctly. If we're looking at an index operator with `id` `IF` then it cant match `{letter}` since operator `=` is not a letter
+- Note we specified `letter` afterwards to be very general, could be part of `THEN` or something else. The braces are just to say we want to use `letter` instead of "letter"
+
+`IF (A < (B + C) * D) THEN`
+- whitespaces dont matter too much in this example
+- note how the first left bracket matches before `A` and the first right bracket matches after `C`. In this case the lexeme matches well since we are looking for `\){letter}` which means `)*` doesnt match but `) T` matches
+
+### Example: While Loop
+
+Say we have something like:
+```
+while (condition) {
+
+}
+```
+or 
+```
+while (condition) statement
+```
+
+then we can use:
+
+```
+while/\(.*\)[\{{letter}]
+```
+
+Note it would be a bit of a problem if there was a new line `\n` within the condition or before/after the condition:
+
+```
+while
+(condition) statement
+
+// OR
+
+while (condition_part_1
+    condition_part_2) statement
+
+// OR
+
+while (
+    condition
+    )
+    {
+        // stuff
+    }
+```
+
+And if there are features like subconditions within conditions, functions within conditions, etc. we can run into many issues just using the default pattern
+- hence it is usually better to just make tokens like `if`, `while`, etc. completely reserved when used properly
+
 ## Syntax Analysis
