@@ -3,7 +3,7 @@ layout: page
 title: Stage 2
 parent: Compilation
 grand_parent: Rei
-nav_order: 1
+nav_order: 2
 ---
 
 # Syntax Analysis
