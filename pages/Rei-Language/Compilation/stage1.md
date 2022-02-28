@@ -10,9 +10,9 @@ nav_order: 1
 
 All about the first steps that compilers usually take to compile a string
 
-We usually tokenise and parse a long string (e.g. combining files into namespace {} mod_strings automatically) to build something that can then be transformed into a lower level representation.
+We usually tokenise and parse a long string (e.g. combining files into namespace {} mod_strings automatically) to build something that can then be transformed into a lower level representation. This IR is closer to machine code and can be further analyzed and optimised, e.g. LLVM. Finally it can be assembled into actual machine code for a certain platform, e.g. x86_64 linux elf
 
-This IR is closer to machine code and can be further analyzed and optimised, e.g. LLVM. Finally it can be assembled into actual machine code for a certain platform, e.g. x86_64 linux elf
+For the first stage, lets look at lexers (tokenisation) which is a whole shabang of automata and regex stuff
 
 # Lexical Analysis
 
@@ -777,5 +777,3 @@ The current 'best' or recommended way is a time-good space-bad DFA simulation al
 State minimisation seems to work for O(nlogn) time and quite space efficient. IDK tbh, I dont really want to implement this myself though later maybe
 
 - Important thing to note is that for every DFA is there a minimum state DFA accepting the same language. The min state DFA for a given language is unique except the names given to the various states
-
-## Syntax Analysis
