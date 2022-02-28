@@ -167,8 +167,57 @@ macro DoThis {
         println("String: $x")
     }
 }
+
+// deriving traits based on fields
+// allow object to be directly compared by comparing each field using operator=
+// usually objects should derive Eq and PartialEq, not implement operator= directly
+@export, derive(PartialEq, Eq, Debug)
+object AnObject {
+    id: Int
+}
+
+// NOTE: classes should implement operator= directly. If all fields of a class implement operator=, then you can also @derive(Eq)
 ```
 
 NOTES:
+
 - for rei v1, we just stick to a single syntax and thus lexer-parser without needing to change things up too much, just extend. I hope there are no glaring issues. So we only make a release if there is no big issues
 - if there are any big issues later on that are slowly found (or hopefully not found hardcore), then we can make rei v2 with a different lexer-parser
+- a rei-prototype as a restricted context-free grammar for ease. No advanced stuff. Maybe annotations. But semicolons, braces, explicit return etc always
+
+```
+// rei prototype
+
+// must specify input and outputs, and their types
+fn function() -> Int {
+    // must have a type annotation and terminal semicolon
+    let i: Int = 3;
+
+    return i;
+}
+
+static k: Int = 0;
+
+class A {
+    // a constructor method is always a constructor method
+    // usable by A::constructor() only
+    fn constructor() {}
+
+    // a mutable field must have a type and terminated
+    let i: Int = 4;
+
+    // non defined field
+    let j: Int;
+
+    // method that explicitly takes &self as a reference
+    fn a_method(&self) -> Int {
+        return i;
+    }
+
+
+    // class level method
+    fn another_method() -> Int {
+        return k;
+    }
+}
+```

@@ -415,6 +415,7 @@ Note a TD for whitespaces is quite simple. We have a single possible transition 
 ## Building a TD-based Lexical Analyser
 
 We can actually build a lexical analyzer from a bunch of different transition diagrams
+
 - the key thing to see is that each state is represented by a piece of code. So a variable `state` holds the number of the current state for a TD. Then we have a bunch of states to choose from depending on the current state object and the next character
 - often the code for a state itself is simply a switch statement or multiway branch that determines the next state by examining the next input char
 
@@ -450,9 +451,11 @@ fn get_relop() -> Token {
 ```
 
 `fail()` could initiate an error correction phase that will try to repair the input if there is no other unused TD that works on the current sequence
+
 - state 8 bears `*` so we must retract the `forward` pointer one position
 
 Now you can see how this fits into the whole lexer:
+
 - arrange for the TDs for each token to be tried sequentially. Then `fail()` resets `forward` to `lexeme_begin` and starts the next TD. So we can use TDs for individual keywords. Only have to use these before we use the diagram for `id` for keywords too, which would be great
 - OR we could run the various TDs in parallel. So we feed the next input character to all TDs on their separate threads. Then each of them can make whichever transitions they wanted. But we must be careful when we have to resolve when one diagram finds a lexeme that matches but other diagrams yet to find a match. So we could take the longest prefix of the input that matches any pattern, and thus prefer an identifier token `thenext` instead of `then` or operator `->` to `-`. This should work almost 100% of the time by the sound of it
 - OR the best approach. Combine all the TDs into one. Allow the TD to read input until there is no possible next state. Then take the longest lexeme that matches any pattern. The example patterns should be quite easy. We could combine states `0,9,12,22` into a single state `valid_char` and leave other transitions intact
@@ -489,8 +492,8 @@ Pattern { Action }
 Patterns are regular expressions. Actions are C code. Patterns may use declared variables.
 The supporting functions can be used in the translation rule actions. Or they can be compiled separately and used in the compiled C file
 
-
 When we create a lexical analyser instance, it should interact with the parser. How it does this:
+
 - when called by the parser, the lexical analyser code begins reading its remaining input 1 char at a time. It stops when it finds the longest prefix of the input that matches one of the patterns `P_i`
 - then it executes the associated Action code `A_i`. It then returns to the parser
 - if it does not, then maybe the lexer has found a `ws` or something. Then it will proceed to find additional lexemes until one of the corresponding actions causes a return to the parser
@@ -526,29 +529,36 @@ int installNum() {}
 ### Prioritisation and Conflict resolution
 
 So when lex encounters several prefixes of the input that match one or more patterns:
+
 - always prefers a longer prefix to a shorter prefix
 - if longest possible prefix matches 2 or more patterns, prefer the pattern listed first
 
 ### Lookahead Operator
 
 Lex automatically reeads one char ahead of the last char that forms the selected lexeme, as expected
+
 - then retracts the input so only the lexeme itself is consumed in the input string
 - but what if we want to "look ahead", i.e. for patterns that should only be matched when a previous pattern had been found
 - so we use the `/` operator. In regex, this is also `?!` for negative and `?=` for positive
 
 How `/` works:
+
 - what follows `/` is an additional pattern that must be matched before we can decide that the token in question was seen. But the second pattern does not form part of the lexeme
 
 ### Example: Unreserved Identifiers
 
 If we have:
+
 ```
 IF(I,J) = 3
 ```
+
 as an array index operator, we may run into some problems. Typically we want something like:
+
 ```
 IF(condition) THEN ... ENDIF
 ```
+
 - Note we usually dont worry about the ENDIF part in the lexer. That would be the parser's job
 
 But we can sure that an `IF` keyword is always followed by a left bracket, text describing a condition. But the text describing the condition can also be followed by identifiers, other brackets and operators. So to be very general:
@@ -562,18 +572,22 @@ IF/\(.*\){letter}
 - Note we specified `letter` afterwards to be very general, could be part of `THEN` or something else. The braces are just to say we want to use `letter` instead of "letter"
 
 `IF (A < (B + C) * D) THEN`
+
 - whitespaces dont matter too much in this example
 - note how the first left bracket matches before `A` and the first right bracket matches after `C`. In this case the lexeme matches well since we are looking for `\){letter}` which means `)*` doesnt match but `) T` matches
 
 ### Example: While Loop
 
 Say we have something like:
+
 ```
 while (condition) {
 
 }
 ```
-or 
+
+or
+
 ```
 while (condition) statement
 ```
@@ -606,6 +620,162 @@ while (
 ```
 
 And if there are features like subconditions within conditions, functions within conditions, etc. we can run into many issues just using the default pattern
+
 - hence it is usually better to just make tokens like `if`, `while`, etc. completely reserved when used properly
+
+## Finite Automata
+
+Finite automata are 'reconigsers' that say Yes or No about each possible input string. They come in two ways:
+
+- nondeterministic. No restrictions on labels of edges. A symbol can label several edges out of the same state. `epsilon` is an empty label
+- deterministic. Each state and symbol has exactly 1 edge with that symbol leaving that state
+
+Regular languages are languages that regular expressions can describe. It would be great to be able to make a regular language, though it can be hard if you want advanced and nested functionality. The fact that finite automata are able to recognise regular languages is really cool
+
+## NFA
+
+An NFA can be represented by a transition graph. Nodes are states and edges (labeled) represent the transition function
+
+- an edge `a` from `s` to `t` exists iff `t` is one of the next states for `s` and input `a`
+
+What is a TG? It is similar to a TD except:
+
+- the same symbol can label edges from one state to several different states
+- an edge may be labeled `epsilon`
+
+So in a TG, we can go to more than one node in a step. If we are stuck in one node on the next input char, then we drop that path and keep going with the other paths. Like BFS
+
+### Transition Tables
+
+We can represent a TG with a table (2D array). You can see how this can be useful
+
+- each row corresponds to 1 state, each col corresponds to the input symbol and `epsilon` (which needs to be always there in its own row)
+- so we can have many input symbols, like A-Za-z0-9_, etc. and `ws` too. `epsilon` should be included automatically
+- then we write each state out for each possible input char. Each index value is a set of states that the system should transition to when the state + input char is met on a cycle
+
+## DFA
+
+A DFA is a special case of NFA when:
+
+- there are no moves on input `epsilon`
+- for each state `s` and input char `a`, there is a single edge out of `s` labeled `a`
+
+This means each entry is a single state transition, and no need to use set notation
+
+- a simple, concrete algorithm for recognising strrings
+
+Good thing is, every regular expression / NFA can be converted to a DFA. Since DFA simulates when building the lexical analyser rather than the analyser itself
+
+### Example: Simulating a DFA
+
+Like a TD, it can be quite simple and only needs to be single threaded (though exploiting parallelism can be good later on)
+
+```
+fn dfa_accept() -> bool {
+    let s = State()
+    let c = ''
+
+    while (c = next_char()) != EOF {
+        s = move(s, c)
+    }
+
+    return (s in States::Accepting)
+}
+```
+
+- so the DFA will return `true` if it finds a lexeme that matches an accepting state. Note we dont have ways to set priorities yet, it only returns the first matched token. But we could reserve stuff as keywords and put them first. I think that makes sense
+
+## Regex -> Automata
+
+We specify a list of regular expressions, convert to an NFA. Then convert that into a DFA. Then we can simulate its behavior to get the resulting lexer
+
+- the NFA -> DFA conversion can take quite a lot of time, even more so than the actual lexer program. There are various heuristics to consider and choose from to build a lexer that trades off speed for simplicity and etc. There doesnt seem to be superior way/one size fits all
+
+### Conversion NFA -> DFA
+
+It is possible that the number of DFA states is exponential in the number of NFA states. This could be bad, but usually for most languages the NFA and DFA have both the same amount of states, and so works pretty well on average
+
+```
+fn convert_to_dfa(DStates: NFA) -> DFA {
+    let T = State()
+    let DTransition = DFA()
+
+    while DStates.unmarked_exists() {
+        T = DStates.get_unmarked_state()
+        T.mark()
+
+        for _a in input_chars {
+            let u = epsilon_closure(move(T, _a))
+            if u not in DStates {
+                DStates.add(u)
+            }
+            DTransition[T,a] = u
+        }
+    }
+
+    return DTransition
+}
+
+fn epsilon_closure(nfa_states_t: Set<State>) -> EpsClosure {
+    let stack = Stack<State>()
+    stack.push_all(nfa_states_t)
+
+    let nfa_states_t = EpsClosure()
+    while not stack.empty() {
+        let t = stack.pop()
+        for u in t.edges(label="eps") {
+            if u not in nfa_states_t {
+                nfa_states_t.add(u)
+                stack.push(u)
+            }
+        }
+    }
+
+    return nfa_states_t
+}
+```
+
+There are also algorithms to simulate the NFA. Overall the time complexity is O(k(n+m))
+
+- k = length of input
+- n = number of nodes
+- m = number of eedges
+
+## Regex -> NFA
+
+We can convert any regex to an NFA through the MYT algorithm
+
+- uses a parse tree as it is 'syntax directed'
+- each subexpression, the algorithm makes a new NFA with an accepting state
+
+Algorithm:
+
+1. parse `r` into its constituent subexpressins
+2. for expression `epsilon` construct i -> f transition where `f` is an accepting state
+3. for any subexpression `a` do the same thing with the edge labeled `a`
+
+### Parse Tree
+
+This is a great structure
+
+![](/assets/img/rei/ParseTree.png)
+
+- as you can see, we enter from nowhere into r3. Then we branch to r1, r2, or r4 depending on `a|b` found or something else. Then the rest is history
+
+## Design of a Lexical Analyser Generator
+
+Something like `lex` is designed through DFAs
+
+- we begin with a lex specification that gets compiled into lexer program
+- run the program with a transition table and actions based on each pattern. This interacts with the DFA simulator
+- the DFA simulator does most of the work of stepping along and recognising the tokens
+
+So we each regex pattern and convert them to NFAs. Combine them all into one by introducing a new start state with `epsilon` transitions for each state
+
+The current 'best' or recommended way is a time-good space-bad DFA simulation algorithm. We use a 2D array to store a single transition state for each entry
+
+State minimisation seems to work for O(nlogn) time and quite space efficient. IDK tbh, I dont really want to implement this myself though later maybe
+
+- Important thing to note is that for every DFA is there a minimum state DFA accepting the same language. The min state DFA for a given language is unique except the names given to the various states
 
 ## Syntax Analysis
