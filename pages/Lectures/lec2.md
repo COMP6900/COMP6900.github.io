@@ -160,11 +160,13 @@ Note `h` is built for type 1 hypervisors which benefit from a minimal host layer
 ## What a bootloader and kernel not have to expose?
 
 The kernel's internal ABI for managing processes and communicating with other kernel modules can be completely obfuscated and randomised. But if we want to expose services to userspace processes or ask the bootloader for a service, we will have to use a clearly defined structure of communication
+
 - an interrupt with a0..7 registers and x0..7 registers. Can maybe expect t0..7 registers to be reset
 - perhaps a memory mapped 'virtual dynamic library' which you can link your ELF program to before running
 - C-repr structs to hold data for back and forths communication, like JSON
 
 In most cases, user-kernel communication occurs through interrupts. For really 'quick' and 'safer' services we could use memory mapped objects that contain the function definition
+
 - for user-user communication, we would prob use some userspace bus and a C-repr struct. The bus would be managed by a kernel module or sparx. Sending a request would be basically an interrupt to the kernel sparx on another thread
 
 For kernel-bootloader communication, we wouldnt have a direct interrupt but rather a direct function call of the SBI functions using `call sbi_function` within kernel code. The structs would also be C-repr, but mostly because we want a stable interface
@@ -177,9 +179,109 @@ Lets talk about RISC-V architectural features
 
 They call it 'Pipelining', but in COMP6900, I will be referring to it as an 'Assembly Line'
 
+### 5 Stage RISC Pipeline
+
+Each HART (hardware execution thread) is pipelined
+
+![](/assets/img/RISC_Pipeline.webp)
+
+- Image taken from [All About Circuits](allaboutcircuits.com)
+
+This means each stage is running at the same time. While an instruction is being executed in the ALU, another instruction waiting can be fetched. The previously fetched instruction can be decoded. And the oldest instruction in the assembly line may be undergoing writeback.
+
+### Hardware View
+
+Inside a processor thread, the pipeline looks like:
+
+![](/assets/img/RISC_Pipeline_hardware.jpg)
+
+- Image taken from [GA Tech](faculty.cc.gatech.edu/~hyesoon/fall10/prog1.html)
+
+Within a HART, the program counter increments or jumps to an instruction address. It then goes to its L1 Instruction Cache and queries for an address of PC. If exists, then can continue onto decoding.
+
+- If not in the I-Cache (e.g., program too big to fit inside cache), then tell the Fetcher to get the 32-bit instruction at address PC from RAM. This can take some time as other stages of the pipeline may have already finished doing what they are doing, so if it does happen, we call this a cache-miss due to either poor spatial/temporal locality
+
+Next, the 32-bit instruction is sent to the decoder, which figures the format, i.e. UJ, B, etc. and the source/destination registers. If any immediates, then consider that too since we wont be doing arithmetic on register-register by register-line.
+
+- Before execution, we have to check if the register file is ready (i.e. no current operations). If not ready, will have to stall/busy wait until ready
+- Note within the CPU itself, the lines are very high speed, prob a magnitude higher than cpu-ram bus. Also with a risc processor we always have load-store unlike x86 which is technically RISC at the hardware level too, just that the decoder does more to load from RAM into a register, then work on it. This means most instructions will prob do something to 1-2 HART registers
+
+The execution stage may take more cycles if we have a branch instruction or load/store from/to memory instruction. There should be a single ALU(64) and maybe FPU(32) to handle float ops. These units will handle the arithmetic and return the result to a register. If an instruction would compare registers then branch, the execution part may need to send the source register values to the ALU for comparrison, e.g. `=` or `>=`. Then depending on the result, a branch is chosen, either stay or jump to the dest address in another register. If jumping, then a branch unit will take that register's value and handle the branch.
+
+- Branch prediction will also be done in this stage. Most programs will choose one brancgh 90% of the time. The processor can see this and give more weight to a certain branch (instruction address)
+- Branch prediction is very useful since you wont have to 'slow down' the entire pipeline to wait for the branch to take place. This is because you would have to wait for all previous instructions to complete so you can make the full jump.
+- Instead you can just branch immediately on the fly based on past branches. If you get it right, the pipeline can keep going as the instructions are correct (given right out of order execution implementation)
+- But if you get it wrong, that can be a problem. You will have to flush the entire pipeline and start from fresh at the other branch. You will get rid of at least 4 assembly cycles, but at least you have the right branch now and the pipeline didnt 'halt' per se, rather just reset
+- If you get it right >=90% of the time, it is pretty good in practice. Much better than halting execution for the other instructions to complete, then branching.
+
+After the instruction has been executed, the result should be in a certain `dest` register. If the instruction was to branch, the branch target address can be forwarded to the PC here.
+
+- If the instruction was to store a value into RAM, the L1 Data Cache will be accessed in order to see whether any addresses matches the `dest` address (value). If so, then the data can be written to the cache instead. If not, then we can check any higher order caches like L2 and L3, and write to those.
+- If those caches dont contain the requested RAM address, then we can send the least recently used entry to L2/L3/writeback/RAM and add the RAM address to L1. L2/L3 should cascade in the same way based on least recently used. As you can see, it would prob be a good idea to have good temporal locality and a program that uses only a small amount of variables in RAM to do what it does.
+- For programs that store complex structures and really long lists, then maybe its not worth it to cache the array/database in the CPU. Or maybe only cache the most used ones.
+- If the instruction was to load a value from RAM into the register, it should be done in the execution stage but interact with the `mem` stage as well like a dual-stage instruction
+
+Finally, we reach the writeback stage. Here the instruction has been done processing. The results
+
+### Cache Entries
+
+To ensure we always have the most up to date entries, we also associate a timestamp of when an entry was updated. In cases of small programs, we prob dont need the RAM at all, just use the data cache.
+
+- There should be no risk of overwriting any new data in RAM since we are doing everything in the CPU, which should know which RAM addresses are being touched.
+- It might a bit more complex with multiple HARTs since we will have to check each cache, and use L2/L3 caches to duplicate the data in the local L1 Data caches
+- Even more if we are using virtual addresses. Each process has their own virtual address space. So on process switch, we will have to flush the data caches to RAM. The instruction caches can just be cleared
+- Also applies when we start a new process or end a process. This also assumes one process per hardware thread. But maybe we are using two hardware threads on a single program. This means two HARTs share the same virtual address space. Should be fine if L2/L3 is updated correctly and mutexes are done properly.
+
+TBH Im not that enlightened here
+
+### Memory Management Unit
+
+The MMU is reponsible for translating virtual addresses to physical addresses. Assumes some page table-like structure in memory with CS registers that store a pointer to its physical address.
+
+- Interacts with the TLB beforehand to see whether a virtual - physical mapping already exists. If so, then use that.
+- If a page isnt in there, it will have to fetch from RAM's page table and place the entry into the TLB using LRU heuristics.
+- If allocating/deallocating pages, will prob need to update the TLB. Maybe flush it always.
+- Used on load/store instructions as well as any program counter instruction lookups. Can be quite expensive so having more TLB entries does make sense.
+
+## Rings
+
+There are rings 0-3 from least privileged to most privileged.
+
+- This is different to x86 where the rings go from most privileged to least privileged
+- Usually, only ring 3 and 0 are used, i.e. kernel-mode and user-mode
+- This is a bit different to actual "modes"
+
+## Execution Modes
+
+There are 4 'modes' of execution which kind of correspond to rings.
+
+Mode M -> most privileged. Any execution can be executed.
+
+Mode S -> kinda actually the most privileged. Has extra structures and concepts to allow virtual addressing.
+
+Mode U -> user mode, least privileged.
+
+Mode H -> hypervisor mode, gives you more instructions to translate from a virtual machine's addresses.
+
 # Gaming on Neutron
 
 Neutron uses a framework called Terraformer3D for developing games optimised for Neutron@RiscV.
 
 - We assume that games are 99% of the time: 3D based, assets created in mainstream editors like Blender and Maya, uses a single Window (ArcWindow), game devs know how to code in vulkan and wgpu.
 - For most graphics programming, wgpu is used as a rust-based framework that wraps around the underlying Vulkan drivers on Neutron. For most things, wgpu should be enough, though if the dev wishes to leverage more control that vulkan offers, they can write vulkan `.vs,.fs,.gs` shaders and link them via vulkano-rs.
+
+## Vulkan
+
+A great api for writing code that runs on the gpu. Can be called from any program that includes the platform's vulkan headers.
+
+- Can be used from wgpu-rs. If creating an executable in rust, just use webgpu. It will detect the gpu and drivers which use vulkan. The underlying window server should also use vulkan for rendering. So a wgpu executable can request a window to be created and an area to render to (framebuffer)
+
+## Writing Games
+
+An engine like Terraformer3D can be used to write a 3D game in rust. By default, uses the wgpu API which uses its own shader format. These shaders can then be embedded into the code itself rather than exist as separate shader files.
+
+To make a game, one starts up Terraformer3D. Then they will be met with a Godot3D-like interface. The engine uses a scene-node structuring system for creating levels and characters.
+
+- Most things are drag and droppable, and use of the GUI instead of the underlying code is recommended, unless you aren't a human
+
+By default, we use rust-std and the terraformer3d library (wrappers around wgpu and etc). Offers great performance. But I want rei to also be an option as well as reiscript for lua-like scripting on a 'finished' game.
