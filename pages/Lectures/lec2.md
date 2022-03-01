@@ -175,6 +175,8 @@ For kernel-bootloader communication, we wouldnt have a direct interrupt but rath
 
 Lets talk about RISC-V architectural features
 
+- HART = "Hardware Thread" in RISC-V
+
 ## Assembly Line Architecture
 
 They call it 'Pipelining', but in COMP6900, I will be referring to it as an 'Assembly Line'
@@ -206,7 +208,7 @@ Next, the 32-bit instruction is sent to the decoder, which figures the format, i
 - Before execution, we have to check if the register file is ready (i.e. no current operations). If not ready, will have to stall/busy wait until ready
 - Note within the CPU itself, the lines are very high speed, prob a magnitude higher than cpu-ram bus. Also with a risc processor we always have load-store unlike x86 which is technically RISC at the hardware level too, just that the decoder does more to load from RAM into a register, then work on it. This means most instructions will prob do something to 1-2 HART registers
 
-The execution stage may take more cycles if we have a branch instruction or load/store from/to memory instruction. There should be a single ALU(64) and maybe FPU(32) to handle float ops. These units will handle the arithmetic and return the result to a register. If an instruction would compare registers then branch, the execution part may need to send the source register values to the ALU for comparrison, e.g. `=` or `>=`. Then depending on the result, a branch is chosen, either stay or jump to the dest address in another register. If jumping, then a branch unit will take that register's value and handle the branch.
+The execution stage may take more cycles if we have a branch instruction or load/store from/to memory instruction. There should be a single ALU(64) and maybe FPU(32) to handle float ops. These units will handle the arithmetic and return the result to a register. If an instruction would compare registers then branch, the execution part may need to send the source register values to the ALU for comparison, e.g. `=` or `>=`. Then depending on the result, a branch is chosen, either stay or jump to the dest address in another register. If jumping, then a branch unit will take that register's value and handle the branch.
 
 - Branch prediction will also be done in this stage. Most programs will choose one brancgh 90% of the time. The processor can see this and give more weight to a certain branch (instruction address)
 - Branch prediction is very useful since you wont have to 'slow down' the entire pipeline to wait for the branch to take place. This is because you would have to wait for all previous instructions to complete so you can make the full jump.
@@ -263,7 +265,7 @@ Mode U -> user mode, least privileged.
 
 Mode H -> hypervisor mode, gives you more instructions to translate from a virtual machine's addresses.
 
-# Gaming on Neutron
+# Basic Gaming on Neutron
 
 Neutron uses a framework called Terraformer3D for developing games optimised for Neutron@RiscV.
 
@@ -285,3 +287,25 @@ To make a game, one starts up Terraformer3D. Then they will be met with a Godot3
 - Most things are drag and droppable, and use of the GUI instead of the underlying code is recommended, unless you aren't a human
 
 By default, we use rust-std and the terraformer3d library (wrappers around wgpu and etc). Offers great performance. But I want rei to also be an option as well as reiscript for lua-like scripting on a 'finished' game.
+
+## User Testing
+
+Unlike other software, Games are very high level and should require proper user testing like alpha/beta tests to gauge the performance, playability, fun, etc. in detail.
+
+Unit testing and integration testing can still help out a lot to make sure you have the proper logic and no weird software bugs. When using a game engine, it may be a bit harder to test for edge cases so the engine itself has to do it well.
+
+## Supporting Tools: Blender
+
+It would be great to have a program like blender run on an OS. Technically you dont need blender to run to use blender models, i.e. `.blend` files or any exported files from blender on another platform. The web itself or any vnc server can offer something similar to the actual experience, just worse quality.
+
+- Design 3D models in blender and any skeletal animations
+
+For stuff like textures or mocap, you'd want to use other software. Though there are extensions to do them in blender.
+
+## Supporting Tools: 3D Model Painters
+
+It would also be great to have something that is optimised for painting large/complex 3D models. Perhaps ways to draw well, and in layers. Perhaps separating different meshes apart to color in things at a time. Ways to make normal maps, height maps, baking textures into the model itself rather than as a separate asset.
+
+## Supporting Tools: VR Viewer
+
+VR is very cool and having something to test out VR within the PC or connect it to the PC for debugging/soft running a game would be great.
