@@ -46,6 +46,38 @@ In RAM, there are a bunch of things we want to keep track of:
 
 In Video RAM, we could have the same thing. Although memory-mapped objects dont make as much sense and can be mostly ignored.
 
+## Page Tables
+
+The core structure that translates between a process' virtual address to an actual physical address. Then can dereference e.g. a 32-bit or 64-bit value at that address to load into a register. Or vice versa, store a 64-bit value from a register to a virtual-physical address.
+
+### PTE
+
+A page table entry is the core feature of a PT. It contains:
+
+```
+@FFI(C)
+object PageTableEntry {
+  @range(4096)
+  frame_number: u64,
+  // if page is in RAM
+  present: bool,
+  // RD_ONLY, RD_WRITE, etc.
+  protection: u4,
+  // was it modified in any way since creation/swap?
+  // basically modified and has not been saved to storage (disk) yet
+  // if we e.g. want to write a block of memory to swap space, we have to check if it is dirty, and if so, write it
+  // if not, then we can just discard the page as the swap space contains the up to date version
+  dirty: bool,
+  // allow page to be cached in TLB. If cachable, the cache may not have the latest data?
+  // more like if a page is really important you might not want to risk caching it
+  cache_enable: bool,
+  // was it used in a recent CPU cycle? May be useful for things like LRU heuristics and time measuring of what pages keep being used
+  referenced: bool,
+}
+```
+
+more on [dirty bit](https://en.wikipedia.org/wiki/Dirty_bit)
+
 ## MMIO
 
 If we use an MMIO scheme, we would prob have to use kernel drivers. If we wanted to use user-manipulatable drivers, we can try something like virtual-user drivers through SR-IOV
@@ -72,3 +104,100 @@ Stuff:
 Could we perhaps place drivers or driver interfaces in userspace for direct use, rather than doing syscalls and stuff indirectly to e.g. read/write from disk or to get the mouse position at the next tick.
 
 - Some like mouse position can be abstracted pretty well by GLAD or something similar so its not a big deal. But having fine grained control over the drivers could also be useful if a program wants to
+
+# Filesystems and Disks
+
+link = <https://en.wikipedia.org/wiki/File_system>
+
+For certain filesystems like ext4, we can have a lot of external fragmentation since we allocate new files randomly and store pointers to them. For NTFS, its more compact at the beginning though requires frequent defraging for internal fragmentation.
+
+- NTFS is relatively simple but works. So as ext4, which tries to improve on ext3.
+- Other filesystems like btrfs and zfs are more enlightened in their features and usages. I'll talk a lot about these as well as the basics like FAT (File allocation table).
+
+## Solid State Drives
+
+They use LBA (logical block addressing). A driver should be able to see how the ssd works and abstract away the logic to allow read() and write() by the kernel interface.
+
+They are NAND Flash so are quite efficient and fast. Unlike a mechanical storage unit like a hard drive or floppy disk or an optical one like a CD (compact disk).
+
+They usually have a small microcontroller and firmware embedded into the device itself, or perhaps the interface like NVMe or SATA. This allows relatively more complex calls to be decoded into simpler calls to address LBA's and stream data back into memory, i.e. via DMA.
+
+### Controller
+
+Within the SSD is a controller chip that directs requests (at each clock cycle) to actual operations on the flash chips that store the information.
+
+![](/assets/img/SSD-controller-large.png)
+
+- a SATA-3 SSD 2.5in form factor. Image taken from [Storage Review](https://www.storagereview.com/wp-content/uploads/2010/04/SSD-controller-large.png)
+
+![](/assets/img/nvme-ssd-controller_2.webp)
+
+![](/assets/img/nvme-ssd-controller_1.png)
+
+- Controller architectures for NVMe SSDs. Images taken from WD and EKWB
+
+SLC = Single Level Cell\
+MLC = Multi Level Cell\
+TLC = Thhree Level Cell\
+QLC = Quad Level Cell
+
+Each increasing level allows lower heat generation, higher efficiency and speed. But higher cost due to expensive technological manufacturing processes.
+
+Notice the 'SLC Cache' in the WD SSD. This is a static NAND flash which is used for frequently looked up LBAs. Since fast SRAM is quite expensive, it would be a problem to make it too fast. But if we have e.g. 30GB of SLC cache we can store a lot of data for much faster lookups, e.g. 2s of cache lookup vs 50s of normal lookup on the same instruction.
+
+- The SLC cache can take a write request and write it to the cache instead in a very fast amount of time. Then during downtime, the controller can tell the cache to start writing to the memory. Now if we're doing this right when we want to do something else with the SSD, that can be a bit of a problem but at least we can usually use the downtime for something good like this
+- The cache itself is SLC, but the rest of the storage is TLC. This allows the cache to be not too expensive as if we were using CPU-type SRAM.
+
+### Low Level Firmware
+
+The SSD controller is still a microcontroller and hence can be programmed, usually in some kind of properitary code.
+
+Great link = <https://www.extremetech.com/extreme/210492-extremetech-explains-how-do-ssds-work>
+
+![](/assets/img/ssd_firmware.png)
+
+- The firmware contains components to manage the entire SSD. Stuff like garbage collection (relocating existing data to new locations, erasing prexisting data), flash translation layer management (for mapping LBAs to flash memory banks), metadata manager (for the entire drive e.g. UEFI GPT, partition metadata is managed by the fs). The NVMe manager usually handles the interface routing and communication requests to and from the SSD.
+- Note that NAND flash drives need to first erase the memory banks, then write a new set of stuff (e.g. a file) to them. To do this they can move a block of memory to somewhere else. Then utilise GC to invalidate/clear the preexisting data.
+- The backend NAND cells may be managed by a 'microcoded' channel controller that directly manages each bank of memory and provides itself some level of abstraction with channels to handle more bits at once. The firmware decodes instructions down to microcode level for the channel controller to make the final scans or writes. A scan of a block would be returned to the firmware, which may then choose to cache or stream back directly through PCIe. A write could be done like RAM where we have rows and cols and write bytes at a time to each [row, col] address. These writes could be structured as streams of pairs of `[row, col]: byte`.
+
+![](/assets/img/SSD-Controller-Elements.png)
+
+- An II SSD could be implemented as a mini environment. It may have its own embedded processor in 16/32 bits with its own small ISA like RISC-V. Would be great to couple it to the CPU arch for the CPU to more easily manipulate it, unless using MMIO which is recommended.
+- Additional settings embedded on-chip in the EEPROM. Can configure the SSD through the Chip Config interface for speed control, LEDs, debug IO, clock control.
+- Almost like a mini motherboard sometimes. Has a bus that can directly access main memory addresses. And the rest is pretty properitary and choice'd in terms of implementation. GPIO as well if you want to program the SSD to do specific things.
+
+### General Flash NAND
+
+SSDs, USB-3 Flash Drives, SD Cards, EMMC are all types of NAND Flash, but with differing implementations, quality and therefore performance. They are usually all quite reliable, and should have ECC stuff on chip.
+
+![](/assets/img/flash_nand_diagram.jpg)
+
+## FAT
+
+link = <https://en.wikipedia.org/wiki/File_Allocation_Table>
+
+### Basics
+
+- use a linked list to store files
+- have a single header at the top of the partition that lays out the pointers to each inode start
+
+## Btrfs
+
+B-Tree filesystem by a whole bunch of people, namely the people over at linux & linux partners, facebook, intel.
+
+### Features
+
+- A lotta storage -> 16Exibytes altogether and 2^64 max number of files indexable (if each file = 1B each)
+- Snapshots of the entire partition like git, and the ability to revert to earlier snapshots
+- Subvolumes -> allow extra namespacing for virtual filesystems. Snapshots are basically subvolumes, and with CoW, is quite quick to make and takes little space
+- Also good features like online/cloud transactions, RAID0, swap files/partitions support, mostly lossless compression per file/volume
+- Problematic: 255 char pathname limit (due to byte storage)
+
+### How does it work?
+
+link = <https://dxuuu.xyz/btrfs-internals-3.html> \
+link = <https://btrfs.wiki.kernel.org/index.php/Btrfs_design>
+
+## Neutron File System
+
+A modified version of btrfs that takes out the unimportant stuff.
