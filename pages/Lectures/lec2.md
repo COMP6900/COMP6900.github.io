@@ -157,6 +157,18 @@ Note `h` is built for type 1 hypervisors which benefit from a minimal host layer
 - Basically an app in userspace. Can be quicker and easier to setup/access than type 1 vms. For normal users that may want extra safety/security for certain tasks and if they want to test out something. Would be great to test out an OS on a type 2 hypervisor as it is quite safe (Note "safety" doesnt equal "security")
 - Even though in practice would be safer and even more secure in some areas, has more gaps between it and the hardware as an attacker can go for the host OS as well. Also never as fast as a type 1 hypervisor, should expect considerable latency with services and devices
 
+## What a bootloader and kernel not have to expose?
+
+The kernel's internal ABI for managing processes and communicating with other kernel modules can be completely obfuscated and randomised. But if we want to expose services to userspace processes or ask the bootloader for a service, we will have to use a clearly defined structure of communication
+- an interrupt with a0..7 registers and x0..7 registers. Can maybe expect t0..7 registers to be reset
+- perhaps a memory mapped 'virtual dynamic library' which you can link your ELF program to before running
+- C-repr structs to hold data for back and forths communication, like JSON
+
+In most cases, user-kernel communication occurs through interrupts. For really 'quick' and 'safer' services we could use memory mapped objects that contain the function definition
+- for user-user communication, we would prob use some userspace bus and a C-repr struct. The bus would be managed by a kernel module or sparx. Sending a request would be basically an interrupt to the kernel sparx on another thread
+
+For kernel-bootloader communication, we wouldnt have a direct interrupt but rather a direct function call of the SBI functions using `call sbi_function` within kernel code. The structs would also be C-repr, but mostly because we want a stable interface
+
 # RISC-V Architecture
 
 Lets talk about RISC-V architectural features
