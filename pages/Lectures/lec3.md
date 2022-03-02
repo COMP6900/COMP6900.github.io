@@ -105,6 +105,43 @@ Could we perhaps place drivers or driver interfaces in userspace for direct use,
 
 - Some like mouse position can be abstracted pretty well by GLAD or something similar so its not a big deal. But having fine grained control over the drivers could also be useful if a program wants to
 
+## RISC-V SV48
+
+SV48 is the virtual memory extension for riscv64.
+
+- 2^36 page table entries when using 4K pages. We calculate this from 2^48/2^12 = 2^36. This is around 69bn maximum entries in the entire table
+
+![](/assets/img/riscv/RV64-RV48-extension-virtual-memory.png)
+
+- Note that PPN[3] is actually 17bits instead of 9. This allows the physical address space to be 2^52 -> 2^4 times larger than the virtual address space
+
+```
+Fields = {
+  // reserved for supervisor code (usually extra kernel bookkeeping)
+  RSW: u2,
+  dirty: bool,
+  accessed: bool,
+  global: bool,
+  // if this page is a userspace page, otherwise reserved for kernel
+  user: bool,
+  // permissions for this page, for userspace (kernel doesnt care)
+  // is this page executable? Does it contain code (32bits each) that we should execute
+  executable: bool,
+  writable: bool,
+  readable: bool,
+  // not scrapped/invalidated and
+  // matches the page on disk, if page to disk is enabled
+  valid: bool,
+}
+```
+
+### Why 48-bits?
+
+Because that is all thats needed, 256TB is a lot of space for the entire OS, apps, etc.
+
+- We usually also only have 16-32GB of RAM on physical machines. Having way more virtual memory than physical memory available doesnt make too much sense either
+- If we wanted to implement 64-bit addresses, we just the rest of the 16bits instead of setting them all the the same bit as bit 47. Then we would have to implement CPU microarches to actually support it, i.e. TLB and CSRs now read 64-bits instead of up to 48 for virtual and 52 for physical. We simply translate a 48-bit address to a 52-bit address (backwards comaptible)
+
 # Filesystems and Disks
 
 link = <https://en.wikipedia.org/wiki/File_system>
