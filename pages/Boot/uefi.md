@@ -2,7 +2,6 @@
 layout: default
 title: UEFI
 parent: Boot
-has_children: true
 ---
 
 ## What is UEFI?
@@ -21,15 +20,14 @@ A GUID is a 'globally unique' identifier. It is a 128-bit label with the format:
 0x aaaa aaaa - bbbb - cccc - dddd - eeee eeee eeee eeee
 ```
 
-```JS
+{% highlight javascript %}
 UUID = {
     time_low: u32,
     time_mid: u16,
     time_high_and_version: u16,
     clock_seq: u16,
     node: u48
-}
-```
+{% endhighlight %}
 
 E.g., a Linux Root partition on x86_64 would have a GUID of `4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709`. This is standard across all linux root partitions.
 
@@ -39,7 +37,7 @@ E.g., a Linux Root partition on x86_64 would have a GUID of `4F68BCE3-E8CD-4DB1-
 
 When a disk is partitioned with GPT, we install a header in LBA-1.
 
-```JS
+{% highlight javascript %}
 GPTHeader = {
     // for little or big endian
     signature: u64,
@@ -63,10 +61,10 @@ GPTHeader = {
     // usually 128 bits/16B
     size_of_entry: u32,
     crc32_partition_entries: u32,
-    // usually 420Bytes or 3360bits (for 512B sectors), or more 
+    // usually 420Bytes or 3360bits (for 512B sectors), or more
     reserved2: >= u3360
 }
-```
+{% endhighlight %}
 
 So what is in LBA 0 one may wonder? Well it can either not be used or be used for MBR/compatibility. When used as a protective MBR, we have:
 
@@ -79,7 +77,7 @@ So what is in LBA 0 one may wonder? Well it can either not be used or be used fo
 
 It is possible to have 2^32 = 4.2bn entries. But idk how much we actually have if 128-bit entry. Then for 31 LBA of 512B each, we have 15,872B of entry space. Hence 15,872/16 = 992 Entries.
 
-```JS
+{% highlight javascript %}
 GPTEntry = {
     // FAT, NTFS, EXT4, etc
     partition_type_guid: u128,
@@ -93,13 +91,13 @@ GPTEntry = {
     // up to 36 UTF-16 (lower chars)
     partition_name: u576
 }
-```
+{% endhighlight %}
 
 - Note: UTF-16 is a 16 or 32-bit character encoding. They are usually little endian (depends on the system's endianess). We can encode all 1 million unicode characters in a variable length encoding. Unlike UTF-8 where we can have 1-4 8-bit values for a single char.
 
 For the flags, we can specify a whole bunch of metadata associated with that partition. So:
 
-```JS
+{% highlight javascript %}
 Flags = {
     // does the partition require specialised software/platforms to maintain it? E.g. an OEM partition
     require_platform: bool,
@@ -114,4 +112,4 @@ Flags = {
     // tells bootloader/kernel to automount or not
     automount: bool
 }
-```
+{% endhighlight %}
