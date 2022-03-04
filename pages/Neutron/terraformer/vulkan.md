@@ -45,3 +45,58 @@ To synchronise all these animations (local transformations) and object translati
 
 - Each tick we can: prioritise the player's input movements. If they would collide with the bounding box of anything else, we can move them out of the way or stop them before collision
 - For other objects like NPCs, we prioritise based on any arbitrary order and do the same thing
+
+# Objects
+
+Each vulkan object is prefixed by `Vk`. E.g. `VkSampler`. Instead of state machine semantics like `glTexture2D` we use local objects.
+
+- A device requires a physical device, i.e. it subclasses it. A descriptor set requries a descriptor pool
+- A phyiscal device has a queue family and memory heap
+
+## Command Buffer
+
+A `VkCommandBuffer` requires an event, pipeline, render pass, descriptor set and pipeline layout. This means a single command needs those things to be validated and placed into the device queue
+
+- the command is submitted to the queue using `QueueSubmit()`. It is fenced and has a semaphore to ensure no data races entering the queue
+
+## Descriptor Set
+
+A `VkDescriptorSet` is one of two key things we need before submitting a command. We need to query and manipulate the GPU memory with `DeviceMemory`. In Device Memory, we bind a `Buffer` to it and create a `BufferView`.
+
+- A buffer can be a vertex buffer, a uniform buffer, a framebuffer. Usually we def want a vertex buffer if we want to draw anything. We have to bind it with an `Image` object to actually create the memory for it
+
+Next we create a `VkSwapchainKHR` to queue our rendered frames for the GPU to output to the display. We queue `VkImage` objects. And those objects have an associated `VkImageView`.
+
+- if we want to apply a texture, we need a sampler. Create a `VkSampler` object with the view objects
+
+With the 2 `View` objects, we can combine them with a `Sampler`, `DescriptorPool` and `DescriptorSetLayout` to create a full `DescriptorSet` object.
+
+- we then combine the descriptor set object with a `PipelineLayout` to bind the descriptor set to be copied into the command buffer. The `PipelineLayout` is important for creating a valid pipeline (i.e. 5/6-stage pipeline) with shaders and stuff so the GPU knows what to do
+
+## Framebuffer
+
+We have to bind a `VkFramebuffer` object with a `VkRenderPass` object to call the `CmdBeginRenderPass` after specifying the descriptor set. This allows the rendered texture to be imaged onto the Framebuffer for manual clearing or post processing.
+
+- The `RenderPass` object same pipeline so vulkan knows which cycle to output to the framebuffer
+
+## Query
+
+Next we can call `CmdBeginQuery` to tell Vulkan to start specifying our final query. We also need a `VkQueryPool` object to create a `Query` object. If we want we can hook onto the query's functions to specify how to begin the query
+
+- We could also just use the default
+- But its great to use for specifying stuff like `Occlusion`, Timestamping, etc. Good for things like depth pre/post shading tests
+
+## Binding the Pipeline
+
+A `VkPipeline` object can be created from a `PipelineLayout` object from earlier and the `RenderPass` object. We then combine it with newly created `ShaderModule` and `PipelineCache` to create the final `Pipeline` object.
+
+- Now we can `CmdBindPipeline` to actually bind the final pipeline specification of a shader program. The shader program was compiled from the user specified vertex -> geometry -> fragment code
+- Note: `PipelineCache` is optionally but recommended as it can really reduce VRAM usage by telling the GPU to cache the pipeline. Then save the cache to disk for later use as well
+
+## Wait for Completion
+
+Then we make an async call `CmdWaitEvents` and wait for the GPU to process the vertex information (Descriptor Sets) through its shader program.
+
+- A `VkFence` is the signal to the program that the execution of the task is completed
+- `Semaphore` can control accesss to VRAM resources like vertices. We dont want two different queues (usually 'kernels') to have a data race on modifying the same vertices
+- An `Event` can be used to listen to specific GPU events. Note, not the same as input events, would use the CPU and something like GLFW for it
