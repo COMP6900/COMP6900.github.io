@@ -53,4 +53,6 @@ fn del_gendisk(gd: &Gendisk);
 - `Gendisk` uses `ARC` to count its refeerences. We use `get_disk, put_disk` to read and increment/decrement the ref count
 - should only call `add_disk` to add a new disk plugged in on the system, when the disk driver has completely initialised
 
-##
+## Driving an SSD
+
+
