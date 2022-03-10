@@ -54,3 +54,9 @@ The above is actually an entry for the 'directory table'. The directory table is
 Note a disk formatted with GPT will usually have a secondary GPT that mirrors the primary GPT, but stored in the higher end LBAs.
 
 - useful for recovery. Should not be touched by software at all
+
+## Ext4
+
+The 'extension 4' filesystem is a partition scheme used widely on linux systems. Mainly for root and general storage partitions/filesystems.
+
+- the 4th extension to the original linux filesystem scheme. Ext 1,2,3 are all extensions as well
