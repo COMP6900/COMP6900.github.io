@@ -60,3 +60,11 @@ Note a disk formatted with GPT will usually have a secondary GPT that mirrors th
 The 'extension 4' filesystem is a partition scheme used widely on linux systems. Mainly for root and general storage partitions/filesystems.
 
 - the 4th extension to the original linux filesystem scheme. Ext 1,2,3 are all extensions as well
+
+## Filesystem Layers
+
+Here is an overview:
+
+![](/assets/img/FS_Layers.gif)
+
+- got this somewhere on google, I think it was from a company or university, thanks to the guy who made it
