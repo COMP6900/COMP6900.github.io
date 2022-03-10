@@ -1,0 +1,56 @@
+---
+layout: default
+title: Lecture 4
+parent: Lectures
+---
+
+## FAT (File Allocation Table)
+
+When you format a partition with FAT, you would first add an entry to the GPT or MBR. Then for those contiguous sectors or LBAs that you want to partition, you place the filesystem's metadata into the first LBA used.
+
+### Nodes
+
+Most filesystems usually have a metadata 'header' table that stores an index to each file. Usually needs only 1 LBA, though more can be used.
+
+### The "Table"
+
+The table refers to a list of entries in the first LBA (not an actual table).
+
+Entry 0-1 contains the volume info for the partition/filesystem. Entry 2-..n refers to a 'cluster'.
+
+- Note a FAT32 fs supports up to a 2TB partition. But each file can only be up to 4GB each
+- to increase the size, you could use a utility to split up a larger file to smaller 4GB files
+
+The table can just be thought of as a 'table of contents' for the disk. (Not the 'filesystem'). Each cluster is either part of a single file, reserved for the OS (e.g. swap space or boot/recovery), free for use. Sometimes a cluster may also be unavailable if it is part of a bad sector.
+
+- when a file points to an entry (cluster), then it is in a linked list structure. If we follow the linked list, we can go through each cluster of the file. All done in the table itself
+- each cluster of a file may not be right next to each other on the disk itself, but the following scheme still works. To 'open' a file we go through the linked list and return the clusters in order. To read, similar idea but we just go through it until we get to the offset. For writes though, we may need to reallocate based on how much space the new write/file takes
+- write reallocation is probably handled quite well by the disk driver. Like git, you would have to make additions and removals and if there are quite large changes, then maybe you just use another function that completely deallocs the prev one and allocs a new cluster list
+
+Each file's metadata is 32B and stores:
+
+```
+filename -> 0-10
+attributes/permissions -> 11
+reserved for NT -> 12
+creation_time_second -> 13
+creation_timestamp -> 14-15
+creation_date -> 16-17
+last_accessed
+first_cluster_number_high16 -> 20-21
+last_modified_time
+last_modified_date
+first_cluster_number_low16 -> 26-27
+file_size -> 28-31 //in bytes
+```
+
+- there is also a 'long' version but dont worry about it. Basically if the filename exceeds 11B, we can add another header right afterwards that stores the full filename
+- the metadata is stored with the file's physical data, usually right before its contents. Files are contiguous so if you know the start and the size, you know exactly where the file is on disk
+
+The above is actually an entry for the 'directory table'. The directory table is another header structure (tree like) stored along with the FAT.
+
+## Secondary GPT
+
+Note a disk formatted with GPT will usually have a secondary GPT that mirrors the primary GPT, but stored in the higher end LBAs.
+
+- useful for recovery. Should not be touched by software at all
