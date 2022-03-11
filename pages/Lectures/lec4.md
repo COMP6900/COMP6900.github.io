@@ -106,7 +106,6 @@ qemu-img create myimage.img mysize
 
 which creates a file of size `mysize`. Then just specify that when you want to launch an OS/vm with that disk `--disk=myimage.img`.
 
-
 ## QEMU Usermode Emulation
 
 Kind of like Wine. We have a containerised environment for translating syscalls across platforms. Given the same architecture and usually ELF64 img format.
@@ -118,3 +117,8 @@ To run an img compiled for another platform, just do the usual `qemu /path/to/im
 
 - if you try to run an img compiled for another arch. It prob wont run since the opcodes are different, or the header says an unsupported platform
 
+## Using C
+
+Use C for it!
+
+JUST TODO. Always use either `/playground/os/<throwaway_name>` or something.
