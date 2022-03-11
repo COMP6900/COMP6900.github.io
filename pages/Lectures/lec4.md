@@ -68,3 +68,26 @@ Here is an overview:
 ![](/assets/img/FS_Layers.gif)
 
 - got this somewhere on google, I think it was from a company or university, thanks to the guy who made it
+
+# QEMU
+
+QEMU is an emulator. It emulates a specific ISA through 'dynamic binary translation'.
+
+- basically interpreted instructions, e.g. riscv64gc -> x86_64 step by step
+- latency can be quite high if interpreting step by step. So if possible, translate the entire .img into one that can be run on the host ISA in a containerised environment
+
+TODO
+
+- [Best documentation](https://wiki.qemu.org/Documentation)
+- [OSDev](https://wiki.osdev.org/QEMU)
+
+## QEMU BIOS
+
+We can write a bios for qemu.
+[TODO READ](https://www.qemu.org/docs/master/specs/acpi_hw_reduced_hotplug.html)
+
+- hotplug on the bios = device can be added or removed without shutting down the system. So we can "hot plug" a usb during runtime
+
+## QEMU Devices
+
+
