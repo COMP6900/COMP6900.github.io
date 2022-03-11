@@ -90,4 +90,31 @@ We can write a bios for qemu.
 
 ## QEMU Devices
 
+[TODO READ](https://qemu.readthedocs.io/en/latest/system/device-emulation.html)
+
+VIRTIO -> virtualised IO
+
+QObject -> QEMU Object Model. Allows us to register a type that we create. Like we can create a custom device that we want to emulate with the components like cpu, maybe gpu?
+
+### Disks
+
+Its a great idea to create a qemu disk as a virtual disk for your image or app. Just do:
+
+```
+qemu-img create myimage.img mysize
+```
+
+which creates a file of size `mysize`. Then just specify that when you want to launch an OS/vm with that disk `--disk=myimage.img`.
+
+
+## QEMU Usermode Emulation
+
+Kind of like Wine. We have a containerised environment for translating syscalls across platforms. Given the same architecture and usually ELF64 img format.
+
+- creates a host process container. Then runs that stuff in there with a syscall translation layer. Im guessing
+- supports linux and bsd systems. For bsd, freebsd, openbsd, etc. and possibly macos. So basically popular modern UNIX systems
+
+To run an img compiled for another platform, just do the usual `qemu /path/to/img`. Replace `qemu` with `qemu_x86-64` or `qemu-i386` if your on x86. And etc. for arm and risc.
+
+- if you try to run an img compiled for another arch. It prob wont run since the opcodes are different, or the header says an unsupported platform
 
