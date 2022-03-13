@@ -117,6 +117,12 @@ To run an img compiled for another platform, just do the usual `qemu /path/to/im
 
 - if you try to run an img compiled for another arch. It prob wont run since the opcodes are different, or the header says an unsupported platform
 
+## QEMU Command Line
+
+[Best place](https://www.mankier.com/1/qemu)
+
+- as we can see, very thorough options for character devices and block devices. Also network devices. And TPM, and multiboot stuff. Also USB and display. If needed, debug options too
+
 ## Using C
 
 Use C for it!
