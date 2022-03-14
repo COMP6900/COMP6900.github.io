@@ -21,6 +21,7 @@ So i'll just put some stuff here as I go. Will be mostly from first principles o
 - high reliance on annotations for structuring, clealiness and metaprogramming
 - supports async/await
 - every field (class, function, variable, constant) in a namespace is `private` by default, use `@export` or `@export-default` per object
+- doc comments and metacomments with `//` and `#`
 
 ```
 let x: Int = 10
