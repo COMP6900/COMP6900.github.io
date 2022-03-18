@@ -4,6 +4,19 @@ title: Drivers
 has_children: true
 ---
 
+## TO READ
+
+[ARM64 ACPI Tables](https://www.kernel.org/doc/html/latest/arm64/acpi_object_usage.html)
+
+- they have to implement DSDT, FADT, GTDT, MADT, MCFG, RSDP, SPCR, XSDT. And a few extra recommended stuff. The others are not as useful. Same for riscv
+- for x86, a different story. Maybe more, maybe less. I think maybe less cause has more abstractions esp windows and more complex BIOSes
+
+[QEMU Boot Steps](https://www.qemu.org/2020/07/03/anatomy-of-a-boot/)
+
+[Device tree overview](https://elinux.org/Device_Tree_What_It_Is)
+
+[Driver dev -> ACPI and MMIO](https://forum.osdev.org/viewtopic.php?f=1&t=32210)
+
 ## What is a driver?
 
 Great question. A driver is software that drives hardware. A driver for a device can be implemented as a bunch of files that take specific OS service calls and translates them to low level MMIO device calls.

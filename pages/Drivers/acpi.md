@@ -15,6 +15,10 @@ ACPI was meant to be just a way to set power states and sleep states for a devic
 
 So we have tables that the BIOS sets up, a small acpi subsystem in the BIOS, and registers that the devices themselves implement to the ACPI spec.
 
+### Tables
+
+Unlike the device tree, we use a bunch of tables. Each entry points to a device. USB and PCI are easily enumerated and should work easily. But other port standards, prob not. HDMI, USB/2, etc. may need either more config or a device tree.
+
 ## Device Discovery
 
 The BIOS interrogates all the devices that are connected to it during boot. Note, can be and should be done on the fly, not always though by specific OEMs.
