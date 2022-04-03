@@ -95,9 +95,9 @@ We would prob use a framebuffer mapped to RAM or VRAM. The hardware controller c
 
 Stuff:
 
-- <http://midi.teragonaudio.com/tech/mmio.htm>
-- <http://www.edm2.com/0403/mmio.html>
-- <https://www.quora.com/What-is-the-difference-between-direct-memory-access-and-memory-mapped-I-O-systems>
+- [MMIO 1](http://midi.teragonaudio.com/tech/mmio.htm)
+- [MMIO 2](http://www.edm2.com/0403/mmio.html)
+- [Difference between DMA and MMIO](https://www.quora.com/What-is-the-difference-between-direct-memory-access-and-memory-mapped-I-O-systems)
 
 ### SR-IOV
 
@@ -144,7 +144,7 @@ Because that is all thats needed, 256TB is a lot of space for the entire OS, app
 
 # Filesystems and Disks
 
-link = <https://en.wikipedia.org/wiki/File_system>
+[What are filesystems?](https://en.wikipedia.org/wiki/File_system)
 
 For certain filesystems like ext4, we can have a lot of external fragmentation since we allocate new files randomly and store pointers to them. For NTFS, its more compact at the beginning though requires frequent defraging for internal fragmentation.
 
@@ -189,7 +189,7 @@ Notice the 'SLC Cache' in the WD SSD. This is a static NAND flash which is used 
 
 The SSD controller is still a microcontroller and hence can be programmed, usually in some kind of properitary code.
 
-Great link = <https://www.extremetech.com/extreme/210492-extremetech-explains-how-do-ssds-work>
+[Great link](https://www.extremetech.com/extreme/210492-extremetech-explains-how-do-ssds-work)
 
 ![](/assets/img/ssd_firmware.png)
 
@@ -211,7 +211,7 @@ SSDs, USB-3 Flash Drives, SD Cards, EMMC are all types of NAND Flash, but with d
 
 ## FAT
 
-link = <https://en.wikipedia.org/wiki/File_Allocation_Table>
+[Wiki for FAT](https://en.wikipedia.org/wiki/File_Allocation_Table)
 
 ### Basics
 
@@ -232,9 +232,24 @@ B-Tree filesystem by a whole bunch of people, namely the people over at linux & 
 
 ### How does it work?
 
-link = <https://dxuuu.xyz/btrfs-internals-3.html> \
-link = <https://btrfs.wiki.kernel.org/index.php/Btrfs_design>
+[BTRFS Internals](https://dxuuu.xyz/btrfs-internals-3.html)
+
+[BTRFS in Linux](https://btrfs.wiki.kernel.org/index.php/Btrfs_design)
 
 ## Neutron File System
 
 A modified version of btrfs that takes out the unimportant stuff.
+
+- supported by the NFSDriver in Arcboot, will search for and prioritise NFS partitions to see whether a neutron kernel image exists in their `/boot` directories
+- if so, will list those first
+
+Things BTRFS doesnt need => extended safety protocols
+
+NFS makes things easier to manage. Creates and deallocates files and dirs quickly.
+
+- a userspace abstraction "Ember" builds upon it by exposing a semantic key-value store of files. Useful for most generic files a user deals with
+- for the most part, NFS is used for system files, app files, executables, links, etc. But they are generally a thing for devs and the OS rather than the user
+
+```
+
+```
