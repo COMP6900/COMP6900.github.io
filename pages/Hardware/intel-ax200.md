@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: math
 title: Intel AX200
 parent: Hardware
 ---
