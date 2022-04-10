@@ -47,25 +47,25 @@ The VID register + DID allows a completely unique fingerprint of the device
 
 A 32-bit BAR:
 
-```
+```rust
 @length = 1
 enum RegionType: Memory = 0, IO = 1
 
-BAR_32 = {
+object BAR_32 {
     region_type: RegionType
 }
 
-BAR_32_Memory {
-    region_type = Memory,
+object BAR_32_Memory {
+    region_type = Memory
     // should be 2 on 64-bit platforms
-    locatable: u2,
-    prefetchable: bool,
+    locatable: u2
+    prefetchable: bool
     // should be 16B aligned, e.g. 0x10 minimum, multiple of
     base_addr: u27
 }
 
-BAR_32_IO {
-    region_type = IO,
+object BAR_32_IO {
+    region_type = IO
     // should be 4B aligned, e.g. 0x04 minimum, multiple of
     base_addr: u31
 }
