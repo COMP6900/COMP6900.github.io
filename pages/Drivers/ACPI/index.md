@@ -1,7 +1,8 @@
 ---
 layout: default
-title: ACPI Device Tables
+title: ACPI
 parent: Drivers
+has_children: true
 ---
 
 We can implement ACPI into our UEFI BIOS so the bootloader can get a view of the preliminarily connected devices during boot and set up data structures for them with SBI. Then new devices that are connected after boot will also use SBI to register
@@ -18,10 +19,6 @@ So we have tables that the BIOS sets up, a small acpi subsystem in the BIOS, and
 ### Tables
 
 Unlike the device tree, we use a bunch of tables. Each entry points to a device. USB and PCI are easily enumerated and should work easily. But other port standards, prob not. HDMI, USB/2, etc. may need either more config or a device tree.
-
-### RSD PTR
-
-
 
 ## Device Discovery
 
