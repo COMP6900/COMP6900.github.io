@@ -32,4 +32,4 @@ High precision event timer. Basically a 64 bit counter from 0-2^64.
 
 ## ARM: Required Tables
 
-DSDT and
+DSDT and etc.

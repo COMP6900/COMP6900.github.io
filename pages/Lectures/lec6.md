@@ -26,5 +26,23 @@ Direct Memory Access is a very cool idea. Instead of going through the CPU to co
 
 Then we can set permissions based on the app. And maybe syscalls to handle some of the stuff instead of allowing apps to directly write to the MMIO. So `ioctl` and `read(driver_fd)` syscalls that are handled by the kernel instead.
 
-## 
+## ACPI
 
+APIC is usually at `0xfec00000` on x86. We would use ACPI tables (uefi standard) to find this mmio address.
+
+We use the RSDP to find the RSDT. The RSDT has entries to each other table somewhere in memory, which are usually in a certain range big enough for expansion. Can waste a bit of virtual mem if we make the range too big but its fine on 48/52-bit virtual addressing.
+
+### APIC Table
+
+The APIC tables store info on programmable interrupt controllers on the system.
+
+- intel standard. Replaces PIC and are used in all recent Intel processors
+- more sophisticated interrupt redirection and things that werent possible in PIC
+
+It starts with a header.
+
+- string: "APIC"
+- length of header: u32
+- APIC_BASE MSR: u32
+- byte40: flags and legacy 8259 PIC mode
+- byte44: packed (c-like) structs containing info about the APICs on the system. IO APIC, local APIC, etc
