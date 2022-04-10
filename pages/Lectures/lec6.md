@@ -46,3 +46,8 @@ It starts with a header.
 - APIC_BASE MSR: u32
 - byte40: flags and legacy 8259 PIC mode
 - byte44: packed (c-like) structs containing info about the APICs on the system. IO APIC, local APIC, etc
+
+The IO and Local structures begin with a 2B header.
+
+- type of the structure: u8
+- length of structure: u8
