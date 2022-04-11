@@ -8,7 +8,27 @@ parent: Neutron
 
 I want it to be similar to apple's fs and btrfs. But minimalised and optimised for neutron syscalls, services and rust/rei apps.
 
-## Flashing for Neutron
+## Design
+
+Sample code for driving an NeFS partition:
+
+```rust
+// abstractions
+struct NeFSDir; // can be root
+struct NeFSFile; // most things are files. A dir is a file with `., ..` and extras
+
+// block objects
+struct NeFSSuperBlock;
+struct NeFSInodeTable;
+struct NeFSInode; // includes b tree of blocks
+struct NeFSBlock;
+```
+
+### Installer
+
+Neutron comes with NeFS drivers loaded by default. Any new Neutron/Quantii installs should partition a drive with a single root NeFS partition that fills up the disk. The installer can also look at other available drives and format them with extra NeFS partitions.
+
+## Flashing Neutron/Quantii
 
 When we format a drive for Neutron, we should use several partitions. Technically we can partition at any point in the drive but assume we have a clean 200GB PCIe SSD.
 
@@ -23,6 +43,8 @@ If compression is turned on, we can instead copy a compressed kernel img onto th
 
 Like Linux and Unix derived OSes, NeFS places system files, binaries, static and shared libraries (for dev or runtimes), newly installed apps in their own separate dirs.
 
+Base hierarchy:
+
 ```
 /
     /desktop
@@ -32,8 +54,11 @@ Like Linux and Unix derived OSes, NeFS places system files, binaries, static and
     /dev
     /mount
     /live
+```
 
-EXPLANATION
+Explanations of each dir:
+
+```
 # quick access stuff and workspaces
 /desktop
     /workspace_0
@@ -75,3 +100,18 @@ EXPLANATION
 # a VFS mainly for storing temporary process data and live logs
 /live
 ```
+
+## Neutron Bundler
+
+The recommended way to install apps. Packages in quantii should be bundled as `.package` archives.
+
+A package can contain zero or more apps. It needs to have at least one 'object' which is either a:
+
+- executable app file `.app` that contains its own thumbnail, config settings, and files that are small
+- executable `.executable` files that may not be self contained, requiring extra folders on the fs to run
+
+If developing an app or library, use the language's packaging system instead. E.g. `cargo`, `npm`, `pip`, `bundle`. These should create their own dirs and package things their own way.
+
+- as well as setting any env variables. It is usually not recommended to install executables through a language's package manager
+- recommended to only install deps (usually libs) to the project dir
+- any extra tools should be installed by `neutron bundler` and be versioned automatically. To use a tool of a specific version, neutron tools should be executed like `<tool> -use <version>`

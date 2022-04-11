@@ -37,15 +37,3 @@ Stuff like initd, devicemanagerd, moused, cpud, networkd, ipcd, filesystemd etc.
 ### Userspace
 
 Your apps and very high level services that run in usermode. HTTP servers and stuff will user kernel networkd sockets. Apps like umbral word will use filesystemd through mmio ipc or syscalls.
-
-## MMIO vs Syscalls
-
-I dont really like syscalls where you store the current state of the app. If multithreaded, will have to see which cores are dedicated to a process and store their state on the process's stack. Then switch to kernel mode, set flags. Then handle request and switch back.
-
-If possible, allow MMIO for stuff like `open, close, read, write, fork` to specific files/directories and devices. Then try to make an MMIO call. If fail due to permissions, then can send a prompt to the user to see if they want to trust it for that dir. If so, then allow MMIO.
-
-| Function | File Metadata |
-| --- | ----------- |
-| open() | apps: List\<App> |
-
-As one can see, each file has a list of POSIX functions and associated apps that can interact with it. If an app can access it, then it can make an MMIO call. Otherwise it cant.

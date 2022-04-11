@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Parallelism
-parent: Neutron
+parent: Kernel
 ---
 
 ## Parallelism
