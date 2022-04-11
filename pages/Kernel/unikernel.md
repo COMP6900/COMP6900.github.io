@@ -1,8 +1,7 @@
 ---
 layout: default
 title: Unikernels
-nav_order: 2
-parent: Neutron
+parent: Kernel
 ---
 
 ## Idea of the Unikernel

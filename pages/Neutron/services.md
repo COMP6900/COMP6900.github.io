@@ -11,7 +11,7 @@ Although there is no need to think of everything as a file, the concept of a fil
 - For most devices, we can mount(dev_id) as a file and then open(filename) to initialise it
 - Then we can `read` and `write` like usual, e.g. to a wifi card (socket), disk, speaker, mic, display, gpu. CPU and RAM access is defined implicitly in the code itself
 
-## Rei
+## API
 
 A generalised service interface using `extern rei`:
 
