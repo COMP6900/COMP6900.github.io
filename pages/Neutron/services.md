@@ -32,12 +32,12 @@ A generalised service interface using `extern rei`:
 | connect | | Attempt to connect to an address, usually ipv4/6. Can be localhost:8000 for example |
 | accept | | Accept an incoming request. Usually used in a loop with a queue of requests |
 | spawn | `fn spawn(executable_path: &String, args: &Vec<String>) -> (ServiceStatus, <pid>)` | Spawn a new process by creating a userspace container environment based on the executable's trustworthy level. execute it (elf64 only) and give it a priority of `PriorityDefault` |
-| nice | `@restricted_level(10) fn nice(pid: u64, nice_level: i64) -> ServiceStatus` | Should be used by the user only. Kernel management should be relied on in most cases |
+| nice | `fn nice(pid: u64, nice_level: i64) -> ServiceStatus` | Should be used by the user only. Kernel management should be relied on in most cases |
 | time | `fn time() -> (ServiceStatus, <u64>)` | Returns the number of seconds elapsed since 1970-01-01 00:00 |
 | gettimeofday | `fn gettimeofday() -> (ServiceStatus, <Timestamp>)` | Should be used with a high level construct like rust-std, which should use the VDSO version rather than the syscall |
-| symlink | `fn symlink(oldpath: &String, newpath: &String) -> ServiceStatus` | |
-| chmod | `@restricted_level(10) fn chmod(path: &String, flags: ChownFlags) -> ServiceStatus` | |
-| chown | `@restricted_level(10) fn chown(path: &String, u_id: u64) -> ServiceStatus` | |
+| symlink | `fn symlink(old_path: &String, new_path: &String) -> ServiceStatus` | |
+| chmod | `fn chmod(path: &String, flags: ChownFlags) -> ServiceStatus` | |
+| chown | `fn chown(path: &String, u_id: u64) -> ServiceStatus` | |
 | chdir | `fn chdir(new_dir_path: &String) -> ServiceStatus` | |
 | mmap | `fn mmap(addr: *data, length: u64, flags: MMapFlags) -> ServiceStatus` | Maps a file to RAM (the process's vm). Works for a device using its `dev_id` too. If you want to `open` to read/write efficiently, can use mmap. Kernel handles writing back changes at idle time |
 | heapalloc | `fn heapalloc(new_dir_path: &String) -> ServiceStatus` | Basically brk() and sbrk() combined for anything malloc() related. For stack based data, the program should be able to as much as it wants directly `<= stack_limit` which is usually quite high or `unlimited` in virtual memory  |
