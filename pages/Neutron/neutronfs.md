@@ -6,11 +6,23 @@ parent: Neutron
 
 ## Overview
 
-I want it to be similar to apple's fs and btrfs. But minimalised and optimised for neutron syscalls, services and rust/rei apps.
+Similar to apple's fs and btrfs. But minimalised and optimised for neutron syscalls, services and quantii apps.
+
+### Features
+
+- optimised for ssds (pcie 4.0 and beyond) and native 64-bit
+- scalable volumes from embedded to HEDT
+- fast dir sizing
+- atomic save primitives
+- encryption and checksums
 
 ## Design
 
-Sample code for driving an NeFS partition:
+Page alignment of 4KiB by default. Partitions are always contiguous.
+
+### API
+
+Sample API for driving an NeFS partition:
 
 ```rust
 // abstractions
@@ -18,15 +30,22 @@ struct NeFSDir; // can be root
 struct NeFSFile; // most things are files. A dir is a file with `., ..` and extras
 
 // block objects
-struct NeFSSuperBlock;
-struct NeFSInodeTable;
-struct NeFSInode; // includes b tree of blocks
-struct NeFSBlock;
+struct SuperBlock;
+struct TreeRoots;
+struct InodeTable;
+struct Inode; // includes b tree of blocks
+struct Block;
 ```
 
-### Installer
+### CoW
 
-Neutron comes with NeFS drivers loaded by default. Any new Neutron/Quantii installs should partition a drive with a single root NeFS partition that fills up the disk. The installer can also look at other available drives and format them with extra NeFS partitions.
+Anytime a file's metadata is updated, it will not modify the underlying blocks directly. Rather it will create a copy of it, modify that. Then only when the operation is completed, it will point the original metadata at the new copy. The old one may be saved as a snapshot.
+
+### Checksums
+
+File checks through the `neutronfs_checksum_verify` function. Each time a modification/write occurs, a new checksum is generated and stored along with the file.
+
+Only when a `Pass` status is returned, the file contents should be copied into the kernel buffer as a MM file.
 
 ## Flashing Neutron/Quantii
 
@@ -38,6 +57,10 @@ If compression is turned on, we can instead copy a compressed kernel img onto th
 
 - NOTE, the BIOS UEFI/GPT should see the disk in terms of LBA. So 512B chunks. Or maybe 4KiB? Anyway its the reason why the OS also sees things in LBA
 - A GPT entry that points to the start of a bootable partition simply has the boot flag turned on. And a UUID to identify the type of filesystem. Maybe NeFS wouldnt be supported so we can just store `/boot` on a FAT32 partition
+
+### Installer
+
+Neutron comes with NeFS drivers loaded by default. Any new Neutron/Quantii installs should partition a drive with a single root NeFS partition that fills up the disk. The installer can also look at other available drives and format them with extra NeFS partitions.
 
 ## Neutron Filesystem Hierarchy
 

@@ -3,11 +3,11 @@ layout: default
 title: Neutron
 has_children: true
 ---
-Something that isnt as dumb. Well tries to fix the things that are dumb from first ideas
 
 ## Virtual Memory Layout
 
-Based on: <https://www.kernel.org/doc/html/latest/riscv/vm-layout.html>. <br/>
+Based on: [linux riscv virtual memory](https://www.kernel.org/doc/html/latest/riscv/vm-layout.html).
+
 On a 64-bit system with 48-bit virtual memory, we have:
 
 | Space | Range |
@@ -37,3 +37,18 @@ Stuff like initd, devicemanagerd, moused, cpud, networkd, ipcd, filesystemd etc.
 ### Userspace
 
 Your apps and very high level services that run in usermode. HTTP servers and stuff will user kernel networkd sockets. Apps like umbral word will use filesystemd through mmio ipc or syscalls.
+
+## VFS
+
+Any system IO requests and etc. should use the kernel's VFS. It wraps around all supported filesystems with driver implementations.
+
+### API
+
+Shells and apps that want to use neutron functions directly should install the `neutron_api` lib and call its functions. Otherwise it is perfectly fine to use `std` implementations for userspace programs.
+
+```rust
+use neutron_api::vfs;
+
+fn register_fs(fs: &Fs) -> Status;
+fn deregister_fs(fs: &Fs) -> Status;
+```

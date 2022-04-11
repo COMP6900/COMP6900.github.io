@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Graphics Driver
+title: Graphics
 parent: Drivers
 ---
 

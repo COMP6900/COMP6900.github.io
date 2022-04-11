@@ -1,8 +1,8 @@
 ---
 layout: default
 title: Vulkan
-parent: Terraformer
-grand_parent: Neutron
+parent: Graphics
+grand_parent: Drivers
 ---
 
 ## Overview

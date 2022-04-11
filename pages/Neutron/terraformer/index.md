@@ -212,11 +212,11 @@ inputs (parallel) --feed--> [ discerner ] --scene_frustum--> [ scene frustum han
 
 - basically just a lot of individual units. Up the the max supported resolution, e.g. 4K
 - common case: feed in a 1440p grid of vec3 rgb values that need to be filled in
-    - thats like at least 3.7million units in stage 1 to compute each pixel
-    - then for each stage 1 unit, there is 100 stage 2 units for computing 100 rays in parallel, in random directions. Each ray will bounce at most `k` times, and so those stage 2 units may require up to `k` cycles to fully complete
-    - then we combine all 100 results from each ray unit, preferrably at the same time. We should make `k` relatively small or according to how many bounces we are expecting on average before hitting a light, something absorbing or outside the scene. Parallel combine with a FMA unit
-    - each stage 2 unit has direct access to the global scene handler and can somehow request a hit very fast. This is key 2 and kinda problematic as well
-    - feedback the stage2 result to stage 1 and its corresponding pixel
+  - thats like at least 3.7million units in stage 1 to compute each pixel
+  - then for each stage 1 unit, there is 100 stage 2 units for computing 100 rays in parallel, in random directions. Each ray will bounce at most `k` times, and so those stage 2 units may require up to `k` cycles to fully complete
+  - then we combine all 100 results from each ray unit, preferrably at the same time. We should make `k` relatively small or according to how many bounces we are expecting on average before hitting a light, something absorbing or outside the scene. Parallel combine with a FMA unit
+  - each stage 2 unit has direct access to the global scene handler and can somehow request a hit very fast. This is key 2 and kinda problematic as well
+  - feedback the stage2 result to stage 1 and its corresponding pixel
 - total: 370million stage 2 execution units. 3.7 million stage 1 execution units. If we can somehow parallel access a precalc'd scene frustum using the scene handler, then no need for more scene_handlers
 
 ### ML Way
