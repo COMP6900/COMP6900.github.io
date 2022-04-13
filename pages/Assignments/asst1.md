@@ -3,7 +3,8 @@ layout: default
 title: Asst1 - 22S1
 parent: Assignments
 ---
-## Assignment 1: CPU, Bootloaders and Memory <strong>[v1]</strong>
+
+## Assignment 1: CPU, Bootloaders and Memory **[v1]**
 
 Starts Feb. 25th. Due in 2 metric weeks.
 
