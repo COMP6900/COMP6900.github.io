@@ -2,6 +2,7 @@
 layout: default
 title: Memory
 has_children: true
+parent: Kernel
 ---
 ## Memory = RAM
 

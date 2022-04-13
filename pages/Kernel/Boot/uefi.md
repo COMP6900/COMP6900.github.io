@@ -2,6 +2,8 @@
 layout: default
 title: UEFI
 parent: Boot
+grand_parent: Kernel
+
 ---
 
 ## What is UEFI?

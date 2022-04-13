@@ -2,6 +2,8 @@
 layout: default
 title: USB
 parent: Drivers
+grand_parent: Kernel
+
 ---
 
 ## Overview

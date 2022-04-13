@@ -3,6 +3,7 @@ layout: default
 title: Graphics
 nav_order: 2
 parent: Dumb Stuff
+grand_parent: Kernel
 ---
 
 ## Inconsistent GUI

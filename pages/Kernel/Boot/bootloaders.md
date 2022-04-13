@@ -2,6 +2,8 @@
 layout: default
 title: Bootloaders
 parent: Boot
+grand_parent: Kernel
+
 ---
 
 ## Overview

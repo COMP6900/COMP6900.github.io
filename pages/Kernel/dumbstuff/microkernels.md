@@ -3,6 +3,8 @@ layout: default
 title: Microkernels
 nav_order: 2
 parent: Dumb Stuff
+grand_parent: Kernel
+
 ---
 
 Although not as bad as monolithic kernels, we still have some really weird ideas of how to make something good

@@ -2,6 +2,8 @@
 layout: default
 title: BIOS
 parent: Boot
+grand_parent: Kernel
+
 ---
 
 ## What is the BIOS?

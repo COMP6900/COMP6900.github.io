@@ -2,6 +2,7 @@
 layout: default
 title: Bus Communication
 parent: IPC
+grand_parent: Kernel
 ---
 
 ## Why Bus?

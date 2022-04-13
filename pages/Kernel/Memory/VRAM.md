@@ -2,6 +2,7 @@
 layout: default
 title: Video Memory
 parent: Memory
+grand_parent: Kernel
 ---
 ## Basically RAM but for GPU
 There is also virtual memory for different processes, and thus page tables and stuff. Like CPU programs, GPU programs (shaders) can be streamed from disk to VRAM via DMA at a certain offset/virtual memory.

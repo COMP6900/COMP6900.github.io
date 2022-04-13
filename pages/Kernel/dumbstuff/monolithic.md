@@ -3,6 +3,8 @@ layout: default
 title: Monolithic Kernels
 nav_order: 2
 parent: Dumb Stuff
+grand_parent: Kernel
+
 ---
 
 Really, really bad idea. Actually not that bad but if you look at linux, then you know what I mean.

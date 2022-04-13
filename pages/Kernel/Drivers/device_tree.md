@@ -2,6 +2,8 @@
 layout: default
 title: Device Tree
 parent: Drivers
+grand_parent: Kernel
+
 ---
 
 ## Overview

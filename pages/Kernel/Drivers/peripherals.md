@@ -2,6 +2,8 @@
 layout: default
 title: Peripheral Drivers
 parent: Drivers
+grand_parent: Kernel
+
 ---
 
 Peripheral drivers usually go through USB or some other generic port. On PI and other embedded devices, prob GPIO.

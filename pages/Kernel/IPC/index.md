@@ -2,6 +2,7 @@
 layout: default
 title: IPC
 has_children: true
+parent: Kernel
 ---
 
 ## Interprocess Comms

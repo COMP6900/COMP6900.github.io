@@ -2,6 +2,8 @@
 layout: default
 title: SBI
 parent: Boot
+grand_parent: Kernel
+
 ---
 
 ## Supervisor Binary Interface
