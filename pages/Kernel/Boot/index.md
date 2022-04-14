@@ -2,6 +2,7 @@
 layout: default
 title: Boot
 has_children: true
+parent: Kernel
 ---
 
 ## Overview
