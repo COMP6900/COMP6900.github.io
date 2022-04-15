@@ -1,7 +1,8 @@
 ---
 layout: default
 title: ACPI
-parent: Drivers
+parent: UEFI
+grand_parent: Kernel
 has_children: true
 ---
 

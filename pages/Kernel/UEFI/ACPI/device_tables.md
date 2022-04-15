@@ -3,7 +3,6 @@ layout: default
 title: ACPI Device Tables
 parent: ACPI
 grand_parent: Drivers
-has_children: true
 ---
 
 ## Overview
