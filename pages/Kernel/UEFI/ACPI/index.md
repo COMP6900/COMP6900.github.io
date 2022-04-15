@@ -71,3 +71,46 @@ object BAR_32_IO {
     base_addr: u31
 }
 ```
+
+## Driver Guide
+
+From EDK II:
+
+![](/assets/img/uefi/EDK-II-UEFI-Driver-Guide.png)
+
+## Console Devices
+
+### Graphics Output Protocol
+
+A new UEFI standard replacing BIOS' VESA and UGA standards.
+
+- query the modes and set the modes
+- an EFI boot time service, cant access after `ExitBootServices()`. BUT can still access the framebuffer provided by the GOP (MMIO'd)
+
+GOP is a protocol that can be detected by locating the structure's GUID with a `uefi_call_wrapper`.
+
+All UEFI firmware should have GOP since it is so useful. Only old EFI systems like iMacs/intel Macs may not implement it.
+
+[EDK II's implementation of GOP for QEMU](https://github.com/tianocore/edk2/blob/master/OvmfPkg/QemuVideoDxe/Gop.c)
+
+### Other Console Protocols
+
+- Simple Input Protocol
+- Graphics Output Protocol
+- Block IO Protocol
+
+## NIC
+
+### SNP
+
+Simple Network Protocol
+
+![](/assets/img/uefi/snp.jpg)
+
+### NII Protocol & UNDI
+
+The network interface identifier and unified network interface are quite unique.
+
+![](/assets/img/uefi/undi-network.jpg)
+
+

@@ -9,6 +9,7 @@ parent: Kernel
 So we have symmetric multiprocessing and ideas of implicit and explicit parallelism.
 
 - Also very long instruction word. This allows an instruction to contain multiple subinstructions
+- Bottom line: good higher code compiles to good lower code compiles to good bare metal code
 
 ## Superscalar
 
