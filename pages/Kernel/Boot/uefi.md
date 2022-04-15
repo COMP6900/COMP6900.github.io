@@ -18,7 +18,7 @@ GPT = GUID Partition Table
 
 A GUID is a 'globally unique' identifier. It is a 128-bit label with the format:
 
-```
+```rust
 0x aaaa aaaa - bbbb - cccc - dddd - eeee eeee eeee eeee
 ```
 
@@ -69,11 +69,6 @@ GPTHeader = {
 {% endhighlight %}
 
 So what is in LBA 0 one may wonder? Well it can either not be used or be used for MBR/compatibility. When used as a protective MBR, we have:
-
-```
-
-
-```
 
 ### GPT Entry
 
