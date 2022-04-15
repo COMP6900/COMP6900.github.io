@@ -3,7 +3,6 @@ layout: default
 title: Wireless Driver
 parent: Drivers
 grand_parent: Kernel
-
 ---
 
 Wireless drivers also seem to be very complex. Esp the modern Wifi6 + BT5 ones. Intel AX200 for example, almost impossible to reverse engineer well
