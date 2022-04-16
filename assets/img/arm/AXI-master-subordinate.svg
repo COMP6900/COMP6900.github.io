@@ -1,0 +1,253 @@
+
+<!DOCTYPE svg
+  PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="651.969"
+     height="396.851"
+     viewBox="0 0 651.969 396.851">
+   <text transform="translate(52.536 201.394)"
+         font-size="12"
+         font-family="Lato-Regular, Lato">
+      <tspan letter-spacing="-0.01em">Completer</tspan>
+   </text>
+   <rect x="155.906"
+         y="56.693"
+         width="127.559"
+         height="42.924"
+         fill="#00c1de"/>
+   <rect x="325.984"
+         y="56.693"
+         width="127.559"
+         height="42.924"
+         fill="#00c1de"/>
+   <rect x="28.346"
+         y="169.877"
+         width="127.559"
+         height="42.722"
+         fill="#95d600"/>
+   <rect x="28.346"
+         y="254.266"
+         width="212.634"
+         height="98.844"
+         fill="#e5eceb"/>
+   <rect x="184.252"
+         y="169.877"
+         width="127.629"
+         height="42.722"
+         fill="#95d600"/>
+   <rect x="340.158"
+         y="169.877"
+         width="127.559"
+         height="42.722"
+         fill="#95d600"/>
+   <rect x="496.063"
+         y="169.877"
+         width="127.559"
+         height="42.722"
+         fill="#95d600"/>
+   <rect x="28.346"
+         y="113.386"
+         width="595.276"
+         height="42.52"
+         fill="#0091bd"/>
+   <text transform="translate(40.117 197.794)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.01em">Subordinate 1</tspan>
+   </text>
+   <text transform="translate(40.012 277.647)"
+         font-size="14"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">AXI <tspan x="26.208" y="0" letter-spacing="-0.009em">P</tspan>
+      <tspan x="34.552" y="0" letter-spacing="-0.019em">r</tspan>
+      <tspan x="39.417" y="0" letter-spacing="-0.009em">o</tspan>
+      <tspan x="47.25" y="0" letter-spacing="-0.003em">t</tspan>
+      <tspan x="52.276" y="0">o</tspan>
+      <tspan x="60.242" y="0" letter-spacing="-0.009em">c</tspan>
+      <tspan x="66.814" y="0">ol</tspan>
+   </text>
+   <text transform="translate(96.4 304.855)"
+         font-size="14"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.033em">Manager interface</tspan>
+   </text>
+   <text transform="translate(96.4 332.971)"
+         font-size="14"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.01em">Subordinate interface</tspan>
+   </text>
+   <text transform="translate(198.023 197.793)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.01em">Subordinate 2</tspan>
+   </text>
+   <text transform="translate(180.149 84.647)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.033em">Manager 1</tspan>
+   </text>
+   <text transform="translate(217.197 139.749)"
+         font-size="18"
+         fill="#fff"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.007em">I</tspan>
+      <tspan x="4.977" y="0" letter-spacing="-0.007em">n</tspan>
+      <tspan x="14.922" y="0" letter-spacing="-0.003em">t</tspan>
+      <tspan x="21.385" y="0">e</tspan>
+      <tspan x="30.916" y="0" letter-spacing="-0.018em">r</tspan>
+      <tspan x="37.188" y="0">-</tspan>
+      <tspan x="43.884" y="0" letter-spacing="-0.009em">c</tspan>
+      <tspan x="52.335" y="0">onnection a</tspan>
+      <tspan x="145.61" y="0" letter-spacing="-0.019em">r</tspan>
+      <tspan x="151.864" y="0">chi</tspan>
+      <tspan x="174.931" y="0" letter-spacing="-0.003em">t</tspan>
+      <tspan x="181.393" y="0">ectu</tspan>
+      <tspan x="216.115" y="0" letter-spacing="-0.019em">r</tspan>
+      <tspan x="222.369" y="0">e</tspan>
+   </text>
+   <text transform="translate(350.512 84.161)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.033em">Manager 2</tspan>
+   </text>
+   <text transform="translate(352.928 197.794)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.01em">Subordinate 3</tspan>
+   </text>
+   <text transform="translate(508.833 197.794)"
+         font-size="18"
+         fill="#333e48"
+         font-family="Lato-Medium, Lato"
+         font-weight="500">
+      <tspan letter-spacing="-0.01em">Subordinate 4</tspan>
+   </text>
+   <rect x="226.807"
+         y="166.333"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="226.807"
+         y="152.275"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="42.491"
+         y="324.914"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="42.63"
+         y="296.659"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="70.866"
+         y="166.333"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="70.866"
+         y="152.16"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="382.677"
+         y="166.333"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="382.677"
+         y="152.16"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="368.504"
+         y="109.843"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="368.504"
+         y="95.669"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="198.39"
+         y="109.843"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="198.39"
+         y="95.669"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <rect x="538.583"
+         y="166.333"
+         width="42.52"
+         height="7.087"
+         fill="#ff6b00"/>
+   <rect x="538.583"
+         y="152.16"
+         width="42.52"
+         height="7.087"
+         fill="#7d868c"/>
+   <line x1="219.65"
+         y1="102.756"
+         x2="219.65"
+         y2="109.843"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+   <line x1="92.126"
+         y1="159.247"
+         x2="92.126"
+         y2="166.333"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+   <line x1="248.067"
+         y1="159.247"
+         x2="248.067"
+         y2="166.333"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+   <line x1="403.937"
+         y1="159.247"
+         x2="403.937"
+         y2="166.333"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+   <line x1="559.843"
+         y1="159.247"
+         x2="559.843"
+         y2="166.333"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+   <line x1="389.764"
+         y1="102.756"
+         x2="389.764"
+         y2="109.843"
+         fill="none"
+         stroke="#333e48"
+         stroke-miterlimit="10"/>
+</svg>

@@ -21,6 +21,8 @@ An IP like protocol that defines the interface of IP blocks. Does not define the
 - optimises for high bandwidth between manager and subordinate, similar to PCI
 - basically an AMBA sub protocol for block interfaces
 
+![](/assets/img/arm/AXI-master-subordinate.svg)
+
 ### ACE
 
 AXI = Advanced Extensible Interface
