@@ -5,6 +5,10 @@ parent: Filesystems
 grand_parent: Kernel
 ---
 
+## Overview
+
+What if, we have ext2 and fsck builtin. We can do so with journalling!
+
 ## Additions
 
 Basically:
