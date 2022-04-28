@@ -5,6 +5,12 @@ has_children: true
 parent: Kernel
 ---
 
+## Driver Ops
+
+Drivers must use physical addrs to copy the block to and from process memory and disk. You pass a virtual addr to the kernel with `read()`. This gets translated to via the process' TLB/PT to some PAddr in userspace. But in kspace, read() actually translates the vaddr as you go into the kernel. So the driver routines actually work properly without TLB (set paging to false) while reading and writing. This seems pretty unsafe because it is, so the kernel has to ensure the process isnt trying to read too much or write too much / at the wrong place.
+
+A terminal program catches keyboard and mouse inputs. KB inputs are redirected to tty0, which is then directed to the output framebuffer of the `kterm` program. The `kterm` program converts that char into a vector/bitmap form and uses the graphics driver or cpu to render the next image, then overwrite the framebuffer location with the new memory vals. This should happen pretty quickly. IDK if there are ways to conserve energy or speed up. Such as maybe keeping the prev texture and simply adding the new char on. And just changing that specific mem addr on the framebuffer mmio.
+
 ## TO READ
 
 [ARM64 ACPI Tables](https://www.kernel.org/doc/html/latest/arm64/acpi_object_usage.html)
