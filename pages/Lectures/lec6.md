@@ -10,7 +10,7 @@ I dont know if Im even following the course structure. But I think I updated it 
 
 So today we'll learn more about device drivers.
 
-### Wnere do Drivers live?
+### Where do Drivers live?
 
 Drivers can be written for any part of the boot stage. Usually, the bulk of it lives in userspace, e.g. Mesa. The stuff in the kernel usually deals with allocating memory blocks and submitting commands to a device.
 

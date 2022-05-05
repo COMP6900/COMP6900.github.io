@@ -4,11 +4,11 @@ title: Lecture 5
 parent: Lectures
 ---
 
-## The truth I should've learned in school
+## The real lesson
 
-I hate collectivism. Especially half assed ones that try to pretend to endorse freedom.
+I have a grudge against collectivism. Especially half assed ones that try to pretend to endorse freedom.
 
-Note, this doesnt necessarily mean I hate ideologies associated with it. But in general and in practice. If you want a collectivist society, you must go all the way. It is an end, not a means.
+Note, this doesnt necessarily mean I dislike ideologies associated with it. But in general and in practice. If you want a collectivist society, you must go all the way. It is an end, not a means.
 
 But we always talk about means here. For the end is never truly in sight.
 

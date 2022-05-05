@@ -41,3 +41,6 @@ logo: "/assets/img/COMP6900-Logo.png"
 
 plugins:
   - jekyll-feed
+
+# when using github actions
+# baseurl: "/"

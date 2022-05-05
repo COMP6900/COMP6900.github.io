@@ -76,8 +76,6 @@ QEMU is an emulator. It emulates a specific ISA through 'dynamic binary translat
 - basically interpreted instructions, e.g. riscv64gc -> x86_64 step by step
 - latency can be quite high if interpreting step by step. So if possible, translate the entire .img into one that can be run on the host ISA in a containerised environment
 
-TODO
-
 - [Best documentation](https://wiki.qemu.org/Documentation)
 - [OSDev](https://wiki.osdev.org/QEMU)
 
@@ -123,8 +121,6 @@ To run an img compiled for another platform, just do the usual `qemu /path/to/im
 
 - as we can see, very thorough options for character devices and block devices. Also network devices. And TPM, and multiboot stuff. Also USB and display. If needed, debug options too
 
-## Using C
+## QEMU Source Code Analysis
 
-Use C for it!
-
-JUST TODO. Always use either `/playground/os/<throwaway_name>` or something.
+TODO!

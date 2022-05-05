@@ -8,9 +8,9 @@ parent: Lectures
 
 Collectivism is like a sugar pill for fools. It makes you feel like you're going to be okay in the instant, and as if you are part of something big. But in reality you are simply overlooking your own weaknesses and relying on numbers to win rather than enlightened action.
 
-# Hardware Design
+## Hardware Design
 
-## PCB Design
+### PCB Design
 
 Use something like KiCad. You can start off with a schematic to place down all the small components in place, positioned relative to each other. Then you can go into PCB mode and drag and drop the components onto a board in a similar position. But in a more calculated form for easier production, physical stability, heat generation, etc. Although a lot of the heat generation can also be done in lower levels component-pcb wise or higher within the case design.
 
@@ -18,20 +18,20 @@ Use something like KiCad. You can start off with a schematic to place down all t
 - I optimise for size, heat and performance only in the smallest package available. I like to think from negatives. If we go too far then we can scale back.
 - If we think about it the otherway around, if we can still keep going then increase, I feel like its not as good since we can fail at an increased stage, but we cant if we are scaling back instead.
 
-## FPGA Design
+### FPGA Design
 
 It is quite hard to make something high speed and something that 'just works' out of the box. A lot of the IDEs seem quite messy though so it might not be too bad as long as you arent thinking in 2000s terms and in modern rust-20s terms.
 
 - It is great having an FPGA to test out a hardware design without actually having to make a PCB for it, manufacture it and put it in place. Just use the FPGA chip itself to simulate an uploaded CPU and connect it to RAM and IO.
 - Spectro FPGA! Just came to my mind. Based on TinyFPGA and Xilinx's normal sized FPGAs we can simulate a small 4-8 core RISC CPU. Though GPUs will take up more space, as well as on chip RAM.
 
-## Scala-Chisel3
+### Scala-Chisel3
 
 Chisel is a mid-high level hardware design library for scala. We can write a specification for a hardware device and simulate it directly and test it with scala's great tools. The clean syntax makes it smooth and cool to use.
 
 - We can also compile from chisel to C++ and do further testing on a lower level. Even better we can simulate it quite fast (although software simulation) with verilator that converts the C++ to a verilog.
 
-# RAM & Memory Management
+## RAM & Memory Management
 
 We use page tables and stuff to manage memory. It is a given thing for kernels.
 
@@ -46,7 +46,7 @@ In RAM, there are a bunch of things we want to keep track of:
 
 In Video RAM, we could have the same thing. Although memory-mapped objects dont make as much sense and can be mostly ignored.
 
-## Page Tables
+### Page Tables
 
 The core structure that translates between a process' virtual address to an actual physical address. Then can dereference e.g. a 32-bit or 64-bit value at that address to load into a register. Or vice versa, store a 64-bit value from a register to a virtual-physical address.
 
@@ -54,7 +54,7 @@ The core structure that translates between a process' virtual address to an actu
 
 A page table entry is the core feature of a PT. It contains:
 
-```
+```rust
 @FFI(C)
 object PageTableEntry {
   @range(4096)
@@ -78,7 +78,7 @@ object PageTableEntry {
 
 more on [dirty bit](https://en.wikipedia.org/wiki/Dirty_bit)
 
-## MMIO
+### MMIO
 
 If we use an MMIO scheme, we would prob have to use kernel drivers. If we wanted to use user-manipulatable drivers, we can try something like virtual-user drivers through SR-IOV
 
@@ -115,7 +115,7 @@ SV48 is the virtual memory extension for riscv64.
 
 - Note that PPN[3] is actually 17bits instead of 9. This allows the physical address space to be 2^52 -> 2^4 times larger than the virtual address space
 
-```
+```rust
 Fields = {
   // reserved for supervisor code (usually extra kernel bookkeeping)
   RSW: u2,
@@ -220,11 +220,11 @@ SSDs, USB-3 Flash Drives, SD Cards, EMMC are all types of NAND Flash, but with d
 
 ## Btrfs
 
-B-Tree filesystem by a whole bunch of people, namely the people over at linux & linux partners, facebook, intel.
+The B-Tree filesystem was made by a whole bunch of dudes, namely the people over at linux & linux partners, facebook, intel.
 
 ### Features
 
-- A lotta storage -> 16Exibytes altogether and 2^64 max number of files indexable (if each file = 1B each)
+- A lotta storage -> 16 Exibytes altogether and 2^64 max number of files indexable (if each file = 1B each)
 - Snapshots of the entire partition like git, and the ability to revert to earlier snapshots
 - Subvolumes -> allow extra namespacing for virtual filesystems. Snapshots are basically subvolumes, and with CoW, is quite quick to make and takes little space
 - Also good features like online/cloud transactions, RAID0, swap files/partitions support, mostly lossless compression per file/volume
@@ -249,7 +249,3 @@ NFS makes things easier to manage. Creates and deallocates files and dirs quickl
 
 - a userspace abstraction "Ember" builds upon it by exposing a semantic key-value store of files. Useful for most generic files a user deals with
 - for the most part, NFS is used for system files, app files, executables, links, etc. But they are generally a thing for devs and the OS rather than the user
-
-```
-
-```
